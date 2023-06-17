@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\JobController;
 use Illuminate\Http\Request;
@@ -25,4 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::apiResource('/jobs', JobController::class);
+    Route::apiResource('/company', CompanyController::class);
 });
