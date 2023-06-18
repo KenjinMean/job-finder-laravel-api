@@ -13,11 +13,13 @@ class CompanyResource extends JsonResource {
      */
     public function toArray(Request $request): array {
         return [
-            'name' => $this->title,
+            'id' => $this->id,
+            'name' => $this->name,
+            'company_logo' => $this->company_logo,
             'location' => $this->location,
-            'website' => $this->description,
-            'description' => $this->requirements,
-            'industry' => $this->salary,
+            'website' => $this->website,
+            'description' => $this->description,
+            'industry' => $this->industry,
         ];
     }
 }
