@@ -19,7 +19,7 @@ class StoreCompanyRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            // 'user_id' => 'required',
+            'comapny_logo' => 'image',
             'name' => 'required',
             'website'  => 'required',
             'location'  => 'required',
