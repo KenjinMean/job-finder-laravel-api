@@ -14,7 +14,12 @@ class JobController extends Controller {
      * Display a listing of the resource.
      */
     public function index(): AnonymousResourceCollection {
-        return JobResource::collection(Job::query()->orderBy('id', 'desc')->paginate());
+        $jobs = Job::with('company')
+            ->orderBy('id', 'desc')
+            ->paginate();
+
+        return JobResource::collection($jobs);
+        // return JobResource::collection(Job::query()->orderBy('id', 'desc')->paginate());
     }
 
     /**
