@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use App\Http\Resources\CompanyResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class JobResource extends JsonResource {
@@ -21,6 +22,7 @@ class JobResource extends JsonResource {
             'requirements' => $this->requirements,
             'salary' => $this->salary,
             'posted_at' => $this->posted_at->format('Y-m-d'),
+            'company' => new CompanyResource($this->whenLoaded('company')),
         ];
     }
 }
