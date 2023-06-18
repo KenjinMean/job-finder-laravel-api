@@ -6,14 +6,17 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CompanyResource;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreCompanyRequest;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CompanyController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index() {
-        //
+    public function index(): AnonymousResourceCollection {
+        return CompanyResource::collection(Company::query()->orderBy('id', 'desc')->paginate());
     }
 
     /**
@@ -21,11 +24,18 @@ class CompanyController extends Controller {
      */
     public function store(StoreCompanyRequest $request) {
         $user = $request->user();
+
+        // dd($request->file('company_logo'));
+
+        $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
+        $path = 'storage/' . str_replace('\\', '/', $path);
+
         $validated = $request->validated();
 
         try {
             $company = Company::create([
                 'user_id' => $user->id,
+                'company_logo' => $path,
                 'name' => $validated['name'],
                 'website' => $validated['website'],
                 'location' => $validated['location'],
@@ -51,6 +61,11 @@ class CompanyController extends Controller {
      */
     public function update(Request $request, string $id) {
         //
+        // if ($oldAvatar !== "avatars/default-avatar.png") {
+        //     Storage::disk('public')->delete($oldAvatar);
+        //   }
+
+        //   auth()->user()->update(['avatar' => $path]);
     }
 
     /**
