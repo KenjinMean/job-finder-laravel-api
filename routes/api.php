@@ -21,15 +21,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
+
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    Route::get('users/company', [UserController::class, 'getCompany']);
+
     Route::apiResource('/jobs', JobController::class);
     Route::apiResource('/company', CompanyController::class);
     Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/users', UserController::class);
+
+    Route::post('logout', [AuthController::class, 'logout']);
 });
