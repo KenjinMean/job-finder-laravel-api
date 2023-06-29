@@ -30,12 +30,14 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::get('users/company', [UserController::class, 'getCompany']);
-
     Route::apiResource('/jobs', JobController::class);
     Route::apiResource('/company', CompanyController::class);
     Route::apiResource('/category', CategoryController::class);
-    Route::apiResource('/users', UserController::class);
+
+    Route::get('user/info', [UserController::class, 'getInfo']);
+    Route::get('user/companies', [UserController::class, 'getCompany']);
+    Route::post('user/set-skills', [UserController::class, 'setSkill']);
+    Route::apiResource('/user', UserController::class);
 
     Route::post('logout', [AuthController::class, 'logout']);
 });
