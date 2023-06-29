@@ -51,14 +51,27 @@ class UserController extends Controller {
         //
     }
 
+    public function getInfo(Request $request) {
+        return response()->json([
+            "user" => $request->user()
+        ]);
+    }
+
     public function getCompany() {
         $user = Auth::user();
-
         if (!$user) {
             return response()->json(['message' => 'User not authenticated'], 401);
         }
-
         $company = $user->company;
         return response()->json($company);
+    }
+
+    public function setSkill(Request $request) {
+        $user = Auth::user();
+        $skills = $request->input('skills');
+        $user->skills()->sync($skills);
+        return response()->json([
+            "message" => "Skills updated successfully."
+        ]);
     }
 }
