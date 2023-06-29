@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Skill;
 use App\Models\Company;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -45,5 +46,9 @@ class User extends Authenticatable {
 
     public function company() {
         return $this->hasMany(Company::class);
+    }
+
+    public function skills() {
+        return $this->belongsToMany(Skill::class, 'user_skill')->withTimestamps();
     }
 }
