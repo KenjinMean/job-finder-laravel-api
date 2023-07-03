@@ -14,8 +14,7 @@ class UserController extends Controller {
      * Display a listing of the resource.
      */
     public function index() {
-        $user = User::with('company')->get();
-        return UserPartialResource::collection($user);
+        return response(User::all());
         // return UserPartialResource::collection(User::with('company')->get());
     }
 
@@ -31,10 +30,8 @@ class UserController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {
-        $user = User::with('company')->findOrFail($id);
-        // return UserPartialResource::collection($user);
-        return response()->json(['message' => 'Ok', 'user' => $user]);
+    public function show() {
+        return response(Auth::user());
     }
 
     /**
@@ -49,29 +46,5 @@ class UserController extends Controller {
      */
     public function destroy(string $id) {
         //
-    }
-
-    public function getInfo(Request $request) {
-        return response()->json([
-            "user" => $request->user()
-        ]);
-    }
-
-    public function getCompany() {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
-        $company = $user->company;
-        return response()->json($company);
-    }
-
-    public function setSkill(Request $request) {
-        $user = Auth::user();
-        $skills = $request->input('skills');
-        $user->skills()->sync($skills);
-        return response()->json([
-            "message" => "Skills updated successfully."
-        ]);
     }
 }
