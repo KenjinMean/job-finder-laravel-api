@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Requests\LoginRequest;
@@ -14,13 +15,30 @@ class AuthController extends Controller {
 
     public function register(RegisterUserRequest $request) {
         $validatedData = $request->validated();
-        $user = User::create($validatedData);
+        $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
+        $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
 
-        // Automatically log in the user
-        Auth::login($user);
-        $token = $user->createToken('main')->plainTextToken;
+        try {
+            $user = User::create($validatedData);
+            UserInfo::create([
+                'firstName' => $validatedData['name'],
+                'user_id' => $user->id,
+                'profile_image' => $defaultProfileImagePath,
+                'cover_image' => $defaultCoverImagePath,
+            ]);
 
-        return response(compact('user', 'token'));
+            Auth::login($user);
+
+            $user = User::with('userInfo')->find(Auth::id());
+            $token = $user->createToken('main')->plainTextToken;
+
+            return response(compact('user', 'token'));
+        } catch (\Exception $e) {
+            return response([
+                'message' => 'Registration failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function login(LoginRequest $request) {
@@ -32,7 +50,8 @@ class AuthController extends Controller {
         }
 
         /** @var User $user */
-        $user = Auth::user();
+        // $user = Auth::user();
+        $user = User::with('userInfo')->find(Auth::id());
         $token = $user->createToken('main')->plainTextToken;
 
         return response(compact('user', 'token'));
