@@ -6,6 +6,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\CompanyResource;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreCompanyRequest;
@@ -23,9 +24,7 @@ class CompanyController extends Controller {
      * Store a newly created resource in storage.
      */
     public function store(StoreCompanyRequest $request) {
-        $user = $request->user();
-
-        // dd($request->file('company_logo'));
+        $user = Auth::user();
 
         $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
         $path = 'storage/' . str_replace('\\', '/', $path);
@@ -53,7 +52,8 @@ class CompanyController extends Controller {
      * Display the specified resource.
      */
     public function show(string $id) {
-        //
+        $company = Company::findOrFail($id);
+        return response($company);
     }
 
     /**
@@ -73,5 +73,14 @@ class CompanyController extends Controller {
      */
     public function destroy(string $id) {
         //
+    }
+
+    public function getCompany() {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+        $company = $user->company;
+        return response()->json($company);
     }
 }
