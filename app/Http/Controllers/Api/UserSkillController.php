@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
+# REMINDER: This controler is unused. You can Delete this controller
+
 class UserSkillController extends Controller {
     /**
      * Display a listing of the resource.
@@ -41,14 +43,5 @@ class UserSkillController extends Controller {
      */
     public function destroy() {
         //
-    }
-
-    public function setSkill(Request $request) {
-        $user = Auth::user();
-        /** @var User $user */
-        $user->skills()->sync($request->input('skills'));
-        return response()->json([
-            "message" => "Skills updated successfully."
-        ]);
     }
 }
