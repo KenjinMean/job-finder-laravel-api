@@ -6,6 +6,8 @@ use App\Models\job_skill;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+# REMINDER: This controler is unused. You can Delete this controller
+
 class JobSkillController extends Controller {
     /**
      * Display a listing of the resource.
