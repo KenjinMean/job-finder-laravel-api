@@ -19,7 +19,7 @@ class StoreSkillRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            "skill" => "requierd|string"
+            "skill" => "required|string"
         ];
     }
 }
