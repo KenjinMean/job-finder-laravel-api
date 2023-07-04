@@ -5,9 +5,8 @@ use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CompanyController;
-use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\UserInfoController;
-use App\Http\Controllers\Api\UserSkillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,11 +25,7 @@ Route::post('register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::apiResource('/jobs', JobController::class);
-    Route::apiResource('/category', CategoryController::class);
-
-    Route::post('set-skills', [UserSkillController::class, 'setSkill']);
-
+    Route::get('skills', [SkillController::class, 'index']);
 
     #user routes
     Route::prefix('users')->group(function () {
@@ -39,19 +34,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show', [UserController::class, 'show'])->name('user.show');
         Route::put('/update', [UserController::class, 'update'])->name('user.update');
         Route::delete('/destroy', [UserController::class, 'destroy'])->name('user.destroy');
+        Route::patch('/update-skills', [UserController::class, 'updateSkill'])->name('user.update-skill');
     });
 
-    #user Company routes
-    Route::prefix('companies')->group(function () {
-        Route::get('/', [CompanyController::class, 'index'])->name('companies.index');
-        Route::post('/store', [CompanyController::class, 'store'])->name('companies.store');
-        Route::get('/show', [CompanyController::class, 'show'])->name('companies.show');
-        Route::put('/update', [CompanyController::class, 'update'])->name('companies.update');
-        Route::delete('/destroy', [CompanyController::class, 'destroy'])->name('companies.destroy');
-        Route::get('/user-companies', [CompanyController::class, 'getCompany'])->name('companies.user-companies');
-    });
-
-    #user Info routes
+    # User Info routes
     Route::prefix('user-infos')->group(function () {
         Route::get('/', [UserInfoController::class, 'index'])->name('user-infos.index');
         Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
@@ -61,6 +47,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/update-profile', [UserInfoController::class, 'updateProfile'])->name('user-infos.update-profile');
         Route::patch('/update-cover', [UserInfoController::class, 'updateCover'])->name('user-infos.update-cover');
     });
+
+    # Company routes
+    Route::get('companies/user-companies', [CompanyController::class, 'getCompany'])->name('companies.user-companies');
+    Route::apiResource('companies', CompanyController::class);
+
+    # Job routes
+    Route::patch('/jobs/update-job-skills/{job}', [JobController::class, 'updateJobSkills']);
+    Route::apiResource('/jobs', JobController::class);
 
     Route::post('logout', [AuthController::class, 'logout']);
 });
