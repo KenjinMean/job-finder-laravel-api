@@ -16,7 +16,7 @@ class JobController extends Controller {
    * Display a listing of the resource.
    */
   public function index(): AnonymousResourceCollection {
-    return JobPreliminaryResource::collection(Job::with('company', 'category')
+    return JobPreliminaryResource::collection(Job::with('company', 'skills')
       ->orderBy('posted_at', 'desc')
       ->paginate(10));
   }
@@ -56,8 +56,7 @@ class JobController extends Controller {
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, string $id) {
-    //
+  public function update(Request $request, string $job_id) {
   }
 
   /**
@@ -65,5 +64,16 @@ class JobController extends Controller {
    */
   public function destroy(string $id) {
     //
+  }
+
+  public function updateJobSkills(Request $request, $job_id) {
+    $job = Job::find($job_id);
+    $skills = $request->input('skills');
+
+    $job->skills()->sync($skills);
+
+    return response()->json([
+      "message" => "Job skills updated successfully."
+    ]);
   }
 }
