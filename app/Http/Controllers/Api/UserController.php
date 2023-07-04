@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RegisterUserRequest;
-use App\Http\Resources\UserPartialResource;
 
 class UserController extends Controller {
     /**
@@ -15,7 +14,6 @@ class UserController extends Controller {
      */
     public function index() {
         return response(User::all());
-        // return UserPartialResource::collection(User::with('company')->get());
     }
 
     /**
@@ -46,5 +44,14 @@ class UserController extends Controller {
      */
     public function destroy(string $id) {
         //
+    }
+
+    public function updateSkill(Request $request) {
+        $user = Auth::user();
+        /** @var User $user */
+        $user->skills()->sync($request->input('skills'));
+        return response()->json([
+            "message" => "Skills updated successfully."
+        ]);
     }
 }
