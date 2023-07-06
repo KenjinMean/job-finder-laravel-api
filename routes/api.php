@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('skills', [SkillController::class, 'index']);
 
-    #user routes
+    # User routes
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('user.index');
         Route::post('/store', [UserController::class, 'store'])->name('user.store');
@@ -53,7 +53,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('companies', CompanyController::class);
 
     # Job routes
+    Route::get('/jobs/get-jobs', [JobController::class, 'getJobs']);
     Route::patch('/jobs/update-job-skills/{job}', [JobController::class, 'updateJobSkills']);
+    Route::get('/jobs/search-jobs', [JobController::class, 'searchJobs']);
     Route::apiResource('/jobs', JobController::class);
 
     Route::post('logout', [AuthController::class, 'logout']);
