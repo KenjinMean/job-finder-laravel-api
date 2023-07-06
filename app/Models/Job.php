@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Skill;
+use App\Policies\JobSkillPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -34,5 +35,9 @@ class Job extends Model {
 
     public function skills() {
         return $this->belongsToMany(Skill::class, 'job_skill')->withTimestamps();
+    }
+
+    public function jobSkillPolicy() {
+        return new JobSkillPolicy();
     }
 }
