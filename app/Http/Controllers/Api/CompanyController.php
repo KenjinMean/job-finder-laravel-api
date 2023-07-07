@@ -5,82 +5,120 @@ namespace App\Http\Controllers\Api;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\CompanyResource;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FilesystemException;
 use App\Http\Requests\StoreCompanyRequest;
+use App\Http\Requests\UpdateCompanyRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CompanyController extends Controller {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(): AnonymousResourceCollection {
-        return CompanyResource::collection(Company::query()->orderBy('id', 'desc')->paginate());
+        try {
+            return CompanyResource::collection(Company::query()->orderBy('id', 'desc')->paginate());
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'error creating job', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreCompanyRequest $request) {
         $user = Auth::user();
-
-        $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
-        $path = 'storage/' . str_replace('\\', '/', $path);
-
         $validated = $request->validated();
-
+        DB::beginTransaction();
         try {
             $company = Company::create([
                 'user_id' => $user->id,
-                'company_logo' => $path,
                 'name' => $validated['name'],
                 'website' => $validated['website'],
                 'location' => $validated['location'],
                 'description' => $validated['description'],
                 'industry' => $validated['industry'],
             ]);
-
-            return response()->json(['message' => 'Company created successfully', 'company' => $company]);
+            $path = null;
+            if ($company) {
+                $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
+                $path = 'storage/' . str_replace('\\', '/', $path);
+                $company->update(['company_logo' => $path]);
+            }
+            DB::commit();
+            return response()->json(['message' => 'company created successfully', 'company' => $company]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error creating company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            DB::rollback();
+            $errorMessage = $e instanceof QueryException ? 'error creating company' : $e->getMessage();
+            $statusCode = $e instanceof QueryException ? Response::HTTP_INTERNAL_SERVER_ERROR : Response::HTTP_BAD_REQUEST;
+            return response()->json(['message' => $errorMessage, 'error' => $e->getMessage()], $statusCode);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id) {
-        $company = Company::findOrFail($id);
-        return response($company);
+        try {
+            return response(Company::findOrFail($id));
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error retrieving user company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id) {
-        //
-        // if ($oldAvatar !== "avatars/default-avatar.png") {
-        //     Storage::disk('public')->delete($oldAvatar);
-        //   }
-
-        //   auth()->user()->update(['avatar' => $path]);
+    public function update(UpdateCompanyRequest $request, $companyId) {
+        $company = Company::findOrFail($companyId);
+        $validated = $request->validated();
+        try {
+            $this->authorize('update', $company);
+            $company->update([
+                'name' => $validated['name'],
+                'website' => $validated['website'],
+                'location' => $validated['location'],
+                'description' => $validated['description'],
+                'industry' => $validated['industry'],
+            ]);
+            return response()->json(['message' => 'Company updated successfully']);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'error updating company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id) {
-        //
+        try {
+            $company = Company::findOrFail($id);
+            $this->authorize('delete', $company);
+            $company->delete();
+            return response()->json(['message' => 'company deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'error deleting company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function getCompany() {
         $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
+        try {
+            return response()->json($user->companies);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'error retrieving user companies', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        $company = $user->company;
-        return response()->json($company);
+    }
+
+    public function updateCompanyImage(Request $request, $companyId) {
+        $company = Company::findOrFail($companyId);
+        try {
+            $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
+            $path = 'storage/' . str_replace('\\', '/', $path);
+            $company->update(['company_logo' => $path]);
+
+            if ($company) {
+                Storage::disk('public')->delete($company->company_logo);
+            }
+        } catch (QueryException $qe) {
+            return response()->json(["message" => "Error Updating Company", "error" => $qe->getMessage()]);
+        } catch (FilesystemException $fe) {
+            return response()->json(["message" => "Error Storing Image", "error" => $fe->getMessage()]);
+        } catch (\Exception $e) {
+            return response()->json(["message" => "An unexpected error occurred", "error" => $e->getMessage()]);
+        }
     }
 }
