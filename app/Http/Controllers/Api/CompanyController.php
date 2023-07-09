@@ -80,6 +80,7 @@ class CompanyController extends Controller {
     public function updateCompanyImage(CompanyUpdateImageRequest $request, $companyId) {
         try {
             $company = Company::findOrFail($companyId);
+            $this->authorize('updateCompanyImage', $company);
             $validatedRequest = $request->validated();
             $this->companyService->updateCompanyImage($company, $validatedRequest);
             return response()->json(["message" => "company image update successfully"]);
