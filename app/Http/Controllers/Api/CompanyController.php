@@ -5,51 +5,42 @@ namespace App\Http\Controllers\Api;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
+use App\Services\CompanyService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CompanyUpdateImageRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\CompanyResource;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FilesystemException;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CompanyController extends Controller {
 
+    private $companyService;
+
+    public function __construct(CompanyService $companyService) {
+        $this->companyService = $companyService;
+    }
+
     public function index(): AnonymousResourceCollection {
         try {
-            return CompanyResource::collection(Company::query()->orderBy('id', 'desc')->paginate());
+            return $this->companyService->getCompanies();
         } catch (QueryException $e) {
             return response()->json(['message' => 'error creating job', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     public function store(StoreCompanyRequest $request) {
-        $user = Auth::user();
-        $validated = $request->validated();
-        DB::beginTransaction();
         try {
-            $company = Company::create([
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'website' => $validated['website'],
-                'location' => $validated['location'],
-                'description' => $validated['description'],
-                'industry' => $validated['industry'],
-            ]);
-            $path = null;
-            if ($company) {
-                $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
-                $path = 'storage/' . str_replace('\\', '/', $path);
-                $company->update(['company_logo' => $path]);
-            }
-            DB::commit();
-            return response()->json(['message' => 'company created successfully', 'company' => $company]);
+            $this->companyService->createCompany($request->validated());
+            return response()->json(['message' => 'Company created successfully']);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Validation error', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Exception $e) {
-            DB::rollback();
-            $errorMessage = $e instanceof QueryException ? 'error creating company' : $e->getMessage();
+            $errorMessage = $e instanceof QueryException ? 'Error creating company' : $e->getMessage();
             $statusCode = $e instanceof QueryException ? Response::HTTP_INTERNAL_SERVER_ERROR : Response::HTTP_BAD_REQUEST;
             return response()->json(['message' => $errorMessage, 'error' => $e->getMessage()], $statusCode);
         }
@@ -57,7 +48,7 @@ class CompanyController extends Controller {
 
     public function show(string $id) {
         try {
-            return response(Company::findOrFail($id));
+            return  $this->companyService->showCompany($id);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error retrieving user company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -65,16 +56,10 @@ class CompanyController extends Controller {
 
     public function update(UpdateCompanyRequest $request, $companyId) {
         $company = Company::findOrFail($companyId);
-        $validated = $request->validated();
+        $validatedRequest = $request->validated();
+        $this->authorize('update', $company);
         try {
-            $this->authorize('update', $company);
-            $company->update([
-                'name' => $validated['name'],
-                'website' => $validated['website'],
-                'location' => $validated['location'],
-                'description' => $validated['description'],
-                'industry' => $validated['industry'],
-            ]);
+            $this->companyService->updateCompany($company, $validatedRequest);
             return response()->json(['message' => 'Company updated successfully']);
         } catch (QueryException $e) {
             return response()->json(['message' => 'error updating company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -83,36 +68,32 @@ class CompanyController extends Controller {
         }
     }
 
-    public function destroy(string $id) {
+    public function destroy(string $companyId) {
+        $company = Company::findOrFail($companyId);
+        $this->authorize('delete', $company);
         try {
-            $company = Company::findOrFail($id);
-            $this->authorize('delete', $company);
-            $company->delete();
+            $this->companyService->deleteCompany($company);
             return response()->json(['message' => 'company deleted successfully']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'error deleting company', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function getCompany() {
+    public function showUserCompanies() {
         $user = Auth::user();
         try {
-            return response()->json($user->companies);
+            return $this->companyService->showUserCompanies($user);
         } catch (\Exception $e) {
             return response()->json(['message' => 'error retrieving user companies', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function updateCompanyImage(Request $request, $companyId) {
+    public function updateCompanyImage(CompanyUpdateImageRequest $request, $companyId) {
         $company = Company::findOrFail($companyId);
+        $validatedRequest = $request->validated();
         try {
-            $path = Storage::disk('public')->put('company_logos', $request->file('company_logo'));
-            $path = 'storage/' . str_replace('\\', '/', $path);
-            $company->update(['company_logo' => $path]);
-
-            if ($company) {
-                Storage::disk('public')->delete($company->company_logo);
-            }
+            $this->companyService->updateCompanyImage($company, $validatedRequest);
+            return response()->json(["message" => "company image update successfully"]);
         } catch (QueryException $qe) {
             return response()->json(["message" => "Error Updating Company", "error" => $qe->getMessage()]);
         } catch (FilesystemException $fe) {
