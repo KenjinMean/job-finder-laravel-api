@@ -20,7 +20,6 @@ class StoreJobRequest extends FormRequest {
     public function rules(): array {
         return [
             'company_id' => 'required',
-            'category_id' => 'required',
             'title' => 'required',
             'location' => 'required',
             'description' => 'required',
