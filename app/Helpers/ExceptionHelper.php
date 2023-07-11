@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Throwable;
+use TypeError;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\QueryException;
@@ -33,8 +34,10 @@ class ExceptionHelper {
         return ResponseHelper::errorResponse('Model not found', Response::HTTP_NOT_FOUND, $e->getMessage());
       case $e instanceof FilesystemException:
         return ResponseHelper::errorResponse('Filesystem error', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+      case $e instanceof TypeError:
+        return ResponseHelper::errorResponse('Type error occurred', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
       default:
-        return ResponseHelper::errorResponse('General error occurred', $e->getMessage());
+        return response()->json(['message' => 'General error occurred', "error" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 }
