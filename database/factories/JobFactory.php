@@ -21,14 +21,11 @@ class JobFactory extends Factory {
             'company_id' => function () {
                 return Company::inRandomOrder()->first()->id;
             },
-            'category_id' => function () {
-                return Category::inRandomOrder()->first()->id;
-            },
             'location' => fake()->city,
             'description' => fake()->paragraph,
             'requirements' => fake()->paragraph,
             'salary' => fake()->randomNumber(5),
-            'posted_at' => fake()->dateTimeBetween('-1 month', 'now'),
+            'created_at' => fake()->dateTimeBetween('-1 month', 'now'),
             'updated_at' => fake()->dateTime,
         ];
     }
