@@ -12,11 +12,14 @@ return new class extends Migration {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('company_logo')->nullable();
             $table->string('location');
             $table->string('website');
             $table->text('description');
             $table->string('industry');
             $table->timestamps();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
