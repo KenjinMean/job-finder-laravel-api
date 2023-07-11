@@ -25,7 +25,7 @@ Route::post('register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('skills', [SkillController::class, 'index']);
+    // Route::get('skills', [SkillController::class, 'index']);
 
     # User routes
     Route::prefix('users')->group(function () {
@@ -36,6 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/destroy', [UserController::class, 'destroy'])->name('user.destroy');
         Route::patch('/update-skills', [UserController::class, 'updateSkill'])->name('user.update-skill');
     });
+
+    #Skill routes
+    Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
+    Route::apiResource('skills', SkillController::class);
 
     # User Info routes
     Route::prefix('user-infos')->group(function () {
@@ -49,7 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     # Company routes
-    Route::get('companies/user-companies', [CompanyController::class, 'getCompany'])->name('companies.user-companies');
+    Route::get('companies/user-companies', [CompanyController::class, 'showUserCompanies'])->name('companies.user-companies');
+    Route::patch('companies/update-company-image/{company}', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
     Route::apiResource('companies', CompanyController::class);
 
     # Job routes
