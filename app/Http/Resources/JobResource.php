@@ -21,7 +21,7 @@ class JobResource extends JsonResource {
             'description' => $this->description,
             'requirements' => $this->requirements,
             'salary' => $this->salary,
-            'posted_at' => $this->posted_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'company' => new CompanyResource($this->whenLoaded('company')),
         ];
     }
