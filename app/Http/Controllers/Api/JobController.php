@@ -42,7 +42,7 @@ class JobController extends Controller {
     public function show(int $jobId): JsonResponse {
         try {
             $job = $this->jobService->showJob($jobId);
-            return response()->json($job);
+            return response()->json(["job" => $job]);
         } catch (Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
