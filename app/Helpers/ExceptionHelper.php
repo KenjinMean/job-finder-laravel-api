@@ -37,7 +37,7 @@ class ExceptionHelper {
       case $e instanceof TypeError:
         return ResponseHelper::errorResponse('Type error occurred', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
       default:
-        return response()->json(['message' => 'General error occurred', "error" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        return response()->json(['message' => 'An error occurred', "error" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 }
