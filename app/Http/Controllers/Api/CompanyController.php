@@ -37,17 +37,16 @@ class CompanyController extends Controller {
         }
     }
 
-    public function show(int $id) {
+    public function show(Company $company) {
         try {
-            return  $this->companyService->showCompany($id);
+            return  $this->companyService->showCompany($company);
         } catch (Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
     }
 
-    public function update(UpdateCompanyRequest $request, $companyId) {
+    public function update(UpdateCompanyRequest $request, Company $company) {
         try {
-            $company = Company::findOrFail($companyId);
             $validatedRequest = $request->validated();
             $this->authorize('update', $company);
             $this->companyService->updateCompany($company, $validatedRequest);
@@ -57,9 +56,8 @@ class CompanyController extends Controller {
         }
     }
 
-    public function destroy(int $companyId) {
+    public function destroy(Company $company) {
         try {
-            $company = Company::findOrFail($companyId);
             $this->authorize('delete', $company);
             $this->companyService->deleteCompany($company);
             return response()->json(['message' => 'company deleted successfully']);
@@ -77,11 +75,10 @@ class CompanyController extends Controller {
         }
     }
 
-    public function updateCompanyImage(CompanyUpdateImageRequest $request, $companyId) {
+    public function updateCompanyImage(CompanyUpdateImageRequest $request, Company $company) {
         try {
-            $company = Company::findOrFail($companyId);
-            $this->authorize('updateCompanyImage', $company);
             $validatedRequest = $request->validated();
+            $this->authorize('updateCompanyImage', $company);
             $this->companyService->updateCompanyImage($company, $validatedRequest);
             return response()->json(["message" => "company image update successfully"]);
         } catch (Throwable $e) {
