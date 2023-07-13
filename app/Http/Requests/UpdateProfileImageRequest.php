@@ -19,15 +19,7 @@ class UpdateProfileImageRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'profile_image' => 'required|image|max:2040',
-        ];
-    }
-
-    public function messages(): array {
-        return [
-            'profile_image.required' => 'The profile image is required.',
-            'profile_image.image' => 'The profile image must be a valid image file.',
-            'profile_image.max' => 'The profile image may not be greater than 2MB in size.',
+            "profile_image" => "nullable|image"
         ];
     }
 }
