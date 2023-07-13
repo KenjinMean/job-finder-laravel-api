@@ -29,10 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     # User routes
     Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('user.index');
         Route::post('/store', [UserController::class, 'store'])->name('user.store');
         Route::get('/show', [UserController::class, 'show'])->name('user.show');
-        Route::put('/update', [UserController::class, 'update'])->name('user.update');
+        Route::patch('/update', [UserController::class, 'update'])->name('user.update');
         Route::delete('/destroy', [UserController::class, 'destroy'])->name('user.destroy');
         Route::patch('/update-skills', [UserController::class, 'updateSkill'])->name('user.update-skill');
     });
@@ -48,8 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show', [UserInfoController::class, 'show'])->name('user-infos.show');
         Route::put('/update', [UserInfoController::class, 'update'])->name('user-infos.update');
         Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
-        Route::patch('/update-profile', [UserInfoController::class, 'updateProfile'])->name('user-infos.update-profile');
-        Route::patch('/update-cover', [UserInfoController::class, 'updateCover'])->name('user-infos.update-cover');
+        Route::patch('/update-profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile');
+        Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
     });
 
     # Company routes
