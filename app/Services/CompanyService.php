@@ -62,8 +62,7 @@ class CompanyService {
         }
     }
 
-    public function showCompany($id): JsonResponse {
-        $company = Company::findOrFail($id);
+    public function showCompany($company): JsonResponse {
         return response()->json(new CompanyResource($company));
     }
 
