@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Job;
+use App\Models\Skill;
+use App\Policies\SkillPolicy;
 use App\Policies\CompanyPolicy;
 use App\Policies\JobSkillPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -14,7 +16,9 @@ class AuthServiceProvider extends ServiceProvider {
      *
      * @var array<class-string, class-string>
      */
-    protected $policies = [];
+    protected $policies = [
+        Skill::class => SkillPolicy::class,
+    ];
 
     /**
      * Register any authentication / authorization services.
