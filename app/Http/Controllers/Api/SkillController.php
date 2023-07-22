@@ -22,7 +22,7 @@ class SkillController extends Controller {
 
     public function index() {
         try {
-            $this->authorize('viewAll');
+            $this->authorize('viewAll', Skill::class);
             return $this->skillService->getSkills();
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
