@@ -11,7 +11,11 @@ use App\Helpers\ExceptionHelper;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 use App\Http\Requests\RegisterUserRequest;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AuthController extends Controller {
 
@@ -46,39 +50,6 @@ class AuthController extends Controller {
         try {
             $this->authService->logout($request);
             return response(['message' => 'User logged out successfully.'], Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    # Email verification
-    public function verificationNotice(Request $request) {
-        try {
-            return $this->authService->verificationNotice($request);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    public  function verificationVerify(Request $request, $id, $hash) {
-        try {
-            return $this->authService->verificationVerify($request, $id, $hash);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    public function verificationSend(Request $request) {
-        try {
-            return $this->authService->verificationSend($request);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    public function verificationRedirect(Request $request) {
-        try {
-            return $this->authService->verificationRedirect($request);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
