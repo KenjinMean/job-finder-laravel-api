@@ -12,6 +12,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -36,6 +37,8 @@ class ExceptionHelper {
         return ResponseHelper::errorResponse('Filesystem error', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
       case $e instanceof TypeError:
         return ResponseHelper::errorResponse('Type error occurred', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+      case $e instanceof TokenExpiredException:
+        return ResponseHelper::errorResponse('Token has expired', Response::HTTP_UNAUTHORIZED, $e->getMessage());
       default:
         return response()->json(['message' => 'An error occurred', "error" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
