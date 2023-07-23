@@ -25,7 +25,7 @@ use App\Http\Controllers\Api\UserInfoController;
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::post('logout', [AuthController::class, 'logout'])
-    ->middleware(['auth:api', 'verified', 'check.token.expiration'])
+    ->middleware(['auth:api', 'check.token.expiration'])
     ->name('logout');
 
 # OAuth service providers route :: SOCIALITE
@@ -66,6 +66,7 @@ Route::middleware(['auth:api', 'verified', 'check.token.expiration'])->group(fun
 // Route::apiResource('companies', CompanyController::class);
 Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('company.show');
 Route::middleware(['auth:api', 'verified', 'check.token.expiration'])->group(function () {
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('companies/user-companies', [CompanyController::class, 'showUserCompanies'])->name('companies.user-companies');
     Route::patch('companies/update-company-image/{company}', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
     Route::post('/companies', [CompanyController::class, 'store'])->name('company.store');
