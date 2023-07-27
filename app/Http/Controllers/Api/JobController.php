@@ -71,7 +71,7 @@ class JobController extends Controller {
         }
     }
 
-    public function getJobs() {
+    public function getJobPostings() {
         try {
             return $this->jobService->getPaginatedJobsWithDetails();
         } catch (Throwable $e) {
