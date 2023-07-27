@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use Throwable;
 use App\Models\Company;
-use App\Services\CompanyService;
 use App\Helpers\ExceptionHelper;
+use App\Helpers\JwtHelper;
+use App\Services\CompanyService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\CompanyUpdateImageRequest;
 
 class CompanyController extends Controller {
@@ -30,7 +31,9 @@ class CompanyController extends Controller {
 
     public function store(StoreCompanyRequest $request) {
         try {
-            $this->companyService->createCompany($request->validated());
+            $user = JwtHelper::getUserFromToken();
+            $validatedRequest = $request->validated();
+            $this->companyService->createCompany($user, $validatedRequest);
             return response()->json(['message' => 'Company created successfully']);
         } catch (Throwable $e) {
             return ExceptionHelper::handleException($e);
@@ -68,7 +71,7 @@ class CompanyController extends Controller {
 
     public function showUserCompanies() {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             return $this->companyService->showUserCompanies($user);
         } catch (Throwable $e) {
             return ExceptionHelper::handleException($e);
