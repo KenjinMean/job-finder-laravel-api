@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use App\Helpers\ExceptionHelper;
+use App\Helpers\JwtHelper;
 use App\Services\UserInfoService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -25,7 +26,7 @@ class UserInfoController extends Controller {
 
     public function show() {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $userInfo = $this->userInfoService->showUserInfo($user);
             return response()->json($userInfo);
         } catch (\Throwable $e) {
@@ -35,7 +36,7 @@ class UserInfoController extends Controller {
 
     public function update(UpdateUserInfoRequest $request) {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $validatedRequest = $request->validated();
             $this->userInfoService->updateUserInfo($user, $validatedRequest);
             return response()->json(['message' => 'Updated successfully']);
@@ -46,7 +47,7 @@ class UserInfoController extends Controller {
 
     public function updateProfileImage(UpdateProfileImageRequest $request) {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $validatedRequest = $request->validated();
             $this->userInfoService->updateProfileImage($user, $validatedRequest);
             return response()->json(['message' => 'Profile photo updated successfully']);
@@ -57,7 +58,7 @@ class UserInfoController extends Controller {
 
     public function updateCoverImage(UpdateCoverImageRequest $request) {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $validatedRequest = $request->validated();
             $this->userInfoService->updateCoverImage($user, $validatedRequest);
             return response()->json(['message' => 'Cover photo updated successfully']);
