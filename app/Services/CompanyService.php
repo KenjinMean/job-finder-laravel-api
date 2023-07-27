@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\JwtHelper;
 use App\Models\Company;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -26,8 +27,7 @@ class CompanyService {
         return CompanyResource::collection(Company::query()->orderBy('id', 'desc')->paginate());
     }
 
-    public function createCompany($validatedRequest): void {
-        $user = Auth::user();
+    public function createCompany($user, $validatedRequest): void {
         DB::beginTransaction();
         try {
             [
