@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\Response;
 use App\Helpers\ExceptionHelper;
+use App\Helpers\ResponseHelper;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -30,10 +31,7 @@ class AuthController extends Controller {
             $validatedRequest = $request->validated();
             return $this->authService->register($validatedRequest);
         } catch (\Exception $e) {
-            return response([
-                'message' => 'Registration failed',
-                'error' => $e->getMessage(),
-            ], 500);
+            return ResponseHelper::errorResponse('Registration failed', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
 
