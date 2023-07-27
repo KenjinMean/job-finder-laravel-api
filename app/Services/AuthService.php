@@ -4,58 +4,72 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserInfo;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Http\Response;
+use App\Helpers\ResponseHelper;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthService {
-  public function register($validatedRequest) {
-    $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
-    $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
+    public function register($validatedRequest) {
+        $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
+        $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
 
-    $user = User::create($validatedRequest);
-    UserInfo::create([
-      'firstName' => $validatedRequest['name'],
-      'user_id' => $user->id,
-      'profile_image' => $defaultProfileImagePath,
-      'cover_image' => $defaultCoverImagePath,
-    ]);
+        $existingUser = User::where('email', $validatedRequest['email'])->first();
+        if ($existingUser) {
+            if (!empty($existingUser->github_id)) {
+                return response()->json(['message' => 'This email is already associated with a GitHub account. Would you like to log in with GitHub instead?', "error" => "Account Conflict: Email Already Linked", "provider" => "github"], Response::HTTP_CONFLICT);
+            }
+            if (!empty($existingUser->google_id)) {
+                return response()->json(['message' => 'This email is already associated with a Google account. Would you like to log in with Google instead?', "error" => "Account Conflict: Email Already Linked", "provider" => "google"], Response::HTTP_CONFLICT);
+            }
+            return ResponseHelper::errorResponse('This email already exists. Please log in using your email and password.', Response::HTTP_CONFLICT, "Account Conflict: Email Already taken");
+        }
 
-    # SANCTUM token generator
-    // Auth::login($user);
-    // $user = User::with('userInfo')->find(Auth::id());
-    // $token = $user->createToken('main')->plainTextToken;
-    // return response(compact('user', 'token'));
+        $user = User::create([
+            'email' => $validatedRequest['email'],
+            'password' => $validatedRequest['password'],
+        ]);
 
-    # This line is sending email verification
-    event(new Registered($user));
+        UserInfo::create([
+            'firstName' => $validatedRequest['name'],
+            'user_id' => $user->id,
+            'profile_image' => $defaultProfileImagePath,
+            'cover_image' => $defaultCoverImagePath,
+        ]);
 
-    $user = Auth::user();
+        # Uncomment to generate a email verification
+        // event(new Registered($user));
 
-    # JWT token generate
-    $token = JWTAuth::fromUser($user);
-    $user = User::with('userInfo')->find(Auth::id());
-    return response(compact('user', 'token'));
-  }
+        // JWT token generation
+        $token = JWTAuth::fromUser($user);
+        $user = User::with('userInfo')->find($user->id);
 
-  public function login($validatedCredentials) {
-
-    $user = Auth::attempt($validatedCredentials);
-    if (!$user) {
-      return response([
-        'message' => 'provided email or password is incorrect'
-      ], 422);
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ]);
     }
 
-    $user = Auth::user();
-    $token = JWTAuth::fromUser($user);
-    $user = User::with('userInfo')->find(Auth::id());
-    return response(compact('user', 'token'));
-  }
 
-  public function logout($request) {
-    JWTAuth::invalidate();
-    // auth()->logout();
-  }
+    public function login($validatedCredentials) {
+        $user = User::where('email', $validatedCredentials['email'])->first();
+        if ($user) {
+            if (!empty($user->github_id) || !empty($user->google_id)) {
+                return ResponseHelper::errorResponse('Invalid credentials, please double-check your email and password.', Response::HTTP_UNPROCESSABLE_ENTITY, "Authentication Failed: Incorrect Email or Password");
+            }
+        }
+        if (!Auth::attempt($validatedCredentials)) {
+            return ResponseHelper::errorResponse('Invalid credentials, please double-check your email and password.', Response::HTTP_UNPROCESSABLE_ENTITY, "Authentication Failed: Incorrect Email or Password");
+        }
+        $user = Auth::user();
+        $token = JWTAuth::fromUser($user);
+        $user = User::with('userInfo')->find(Auth::id());
+
+        return response(compact('user', 'token'));
+    }
+
+    public function logout() {
+        $token = JWTAuth::getToken();
+        JWTAuth::invalidate($token);
+    }
 }
