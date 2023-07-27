@@ -6,11 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Helpers\ExceptionHelper;
+use App\Helpers\JwtHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateUserSkillRequest;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller {
 
@@ -34,9 +36,10 @@ class UserController extends Controller {
         }
     }
 
+
     public function show() {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $this->authorize('view', $user);
             $response = $this->userService->getUser();
             return response()->json(["user" => $response]);
@@ -47,7 +50,7 @@ class UserController extends Controller {
 
     public function update(UpdateUserRequest $request) {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $validatedRequest = $request->validated();
             $this->authorize('update', $user);
             $this->userService->updateUser($user, $validatedRequest);
@@ -57,9 +60,9 @@ class UserController extends Controller {
         }
     }
 
-    public function destroy(string $id) {
+    public function destroy() {
         try {
-            $user = User::findOrFail($id);
+            $user = JwtHelper::getUserFromToken();
             $this->authorize('delete', $user);
             $this->userService->deleteUser($user);
             return response()->json(['message' => 'User deleted successfully']);
@@ -70,7 +73,7 @@ class UserController extends Controller {
 
     public function updateSkill(UpdateUserSkillRequest $request) {
         try {
-            $user = Auth::user();
+            $user = JwtHelper::getUserFromToken();
             $skills = $request->validated()['skills'];
             $this->authorize('update', $user);
             $this->userService->updateSkill($user, $skills);
