@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class UserService {
   public function createUser($validatedRequest) {
@@ -32,7 +33,8 @@ class UserService {
 
   public function deleteUser($user): void {
     $user->delete();
-    Auth::logout();
+    $token = JWTAuth::getToken();
+    JWTAuth::invalidate($token);
   }
 
   public function updateSkill($user, $skills) {
