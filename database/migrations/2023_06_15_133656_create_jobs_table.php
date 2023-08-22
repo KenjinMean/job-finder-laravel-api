@@ -16,10 +16,9 @@ return new class extends Migration {
             $table->text('description');
             $table->text('requirements');
             $table->string('salary', 50);
-            $table->dateTime('posted_at');
             $table->timestamps();
             $table->unsignedBigInteger('company_id');
-            $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');;
         });
     }
 
