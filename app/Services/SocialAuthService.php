@@ -25,15 +25,15 @@ class SocialAuthService {
     public function handleProviderCallback($provider) {
         $socialiteUser = Socialite::driver($provider)->stateless()->user();
         $column = $provider . '_id';
-        // $user = User::where($column, $socialiteUser->getId())->first();
+        $user = User::where($column, $socialiteUser->getId())->first();
 
-        $user = User::where('email', $socialiteUser->getEmail())->first();
+        $existingUser = User::where('email', $socialiteUser->getEmail())->first();
 
-        if ($user) {
-            if (!$user->google_id && !$user->github_id) {
+        if ($existingUser) {
+            if (!$existingUser->google_id && !$existingUser->github_id) {
                 return ResponseHelper::errorResponse('This email already exists. Please log in using your email and password.', Response::HTTP_CONFLICT, "Account Conflict: Email Already taken");
             }
-            if ($user->$column !== $socialiteUser->getId()) {
+            if ($existingUser->$column != $socialiteUser->getId()) {
                 return response()->json([
                     'message' => 'This email is already associated with a ' . ($provider === 'github' ? 'Google' : 'GitHub') . ' account. Would you like to log in with ' . ($provider === 'github' ? 'Google' : 'GitHub') . ' instead?',
                     'error' => 'Account Conflict: Email Already Linked',
@@ -68,6 +68,9 @@ class SocialAuthService {
         if (!$user) {
             return response()->json(['error' => 'User not found with related UserInfo'], Response::HTTP_NOT_FOUND);
         }
-        return redirect(env('FRONTEND_URL') . '/callback?token=' . $jwtToken);
+        // Serialize the $user object into a query parameter
+        $userData = base64_encode(json_encode($user));
+
+        return redirect(env('FRONTEND_URL') . '/callback?token=' . $jwtToken . '&user=' . $userData);
     }
 }
