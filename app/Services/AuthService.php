@@ -2,14 +2,23 @@
 
 namespace App\Services;
 
+use App\Helpers\JwtHelper;
 use App\Models\User;
 use App\Models\UserInfo;
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use App\Helpers\ResponseHelper;
 use Illuminate\Support\Facades\Auth;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthService {
+
+    public function generateRefreshToken(User $user) {
+        $refreshToken = Str::random(60);
+        $user->update(['refresh_token' => hash('sha256', $refreshToken)]);
+        return $refreshToken;
+    }
+
     public function register($validatedRequest) {
         $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
         $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
@@ -24,32 +33,18 @@ class AuthService {
             }
             return ResponseHelper::errorResponse('This email already exists. Please log in using your email and password.', Response::HTTP_CONFLICT, "Account Conflict: Email Already taken");
         }
-
         $user = User::create([
             'email' => $validatedRequest['email'],
             'password' => $validatedRequest['password'],
         ]);
-
         UserInfo::create([
             'firstName' => $validatedRequest['name'],
             'user_id' => $user->id,
             'profile_image' => $defaultProfileImagePath,
             'cover_image' => $defaultCoverImagePath,
         ]);
-
-        # Uncomment to generate a email verification
-        // event(new Registered($user));
-
-        // JWT token generation
-        $token = JWTAuth::fromUser($user);
-        $user = User::with('userInfo')->find($user->id);
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
+        return JwtHelper::generateAccessToken($user);
     }
-
 
     public function login($validatedCredentials) {
         $user = User::where('email', $validatedCredentials['email'])->first();
@@ -61,15 +56,36 @@ class AuthService {
         if (!Auth::attempt($validatedCredentials)) {
             return ResponseHelper::errorResponse('Invalid credentials, please double-check your email and password.', Response::HTTP_UNPROCESSABLE_ENTITY, "Authentication Failed: Incorrect Email or Password");
         }
-        $user = Auth::user();
-        $token = JWTAuth::fromUser($user);
-        $user = User::with('userInfo')->find(Auth::id());
-
-        return response(compact('user', 'token'));
+        return JwtHelper::generateAccessToken($user);
     }
 
-    public function logout() {
+    public function logout($user) {
+        $user->refresh_token = null;
+        $user->save();
         $token = JWTAuth::getToken();
         JWTAuth::invalidate($token);
     }
+
+    public function refreshToken() {
+        return JwtHelper::refreshAccessToken();
+    }
+
+    #CAN IMPLEMENT THIS using HTTPS
+    // public function refreshToken($request) {
+    //     $refreshToken = $request->input('refresh_token');
+    //     if (!$refreshToken) {
+    //         return response()->json(['error' => 'Invalid refresh token'], 401);
+    //     }
+    //     $user = User::where('refresh_token', hash('sha256', $refreshToken))->first();
+    //     if (!$user) {
+    //         return response()->json(['error' => 'Invalid refresh token'], 401);
+    //     }
+    //     $accessToken = JWTAuth::parseToken()->refresh();
+    //     return response()->json([
+    //         'refresh_token' => $refreshToken,
+    //         'access_token' => $accessToken,
+    //         'token_type' => 'bearer',
+    //         'expires_in' => JWTAuth::factory()->getTTL() * 60, // in minutes 
+    //     ]);
+    // }
 }
