@@ -22,6 +22,7 @@ class JobPreliminaryResource extends JsonResource {
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'company' => new CompanyLogoResource($this->whenLoaded('company')),
             'skills' => SkillResource::collection($this->whenLoaded('skills')),
+            'job_types' => JobTypeResource::collection($this->whenLoaded('jobTypes')),
         ];
     }
 }
