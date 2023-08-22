@@ -27,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject {
         'github_id',
         'google_id',
         'email_verified_at',
+        'refresh_token',
     ];
 
     /**
