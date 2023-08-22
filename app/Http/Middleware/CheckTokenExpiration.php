@@ -3,24 +3,21 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use App\Helpers\ExceptionHelper;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
+use App\Helpers\ResponseHelper;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 
 class CheckTokenExpiration {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle($request, Closure $next) {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
+            $token = JWTAuth::getToken();
+            JWTAuth::checkOrFail($token);
+            return $next($request);
+        } catch (TokenExpiredException $e) {
+            return ResponseHelper::errorResponse('Token has expired', Response::HTTP_UNAUTHORIZED, $e->getMessage());
+        } catch (\Exception $e) {
+            return ResponseHelper::errorResponse('Failed to authenticate token', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
-
-        return $next($request);
     }
 }
