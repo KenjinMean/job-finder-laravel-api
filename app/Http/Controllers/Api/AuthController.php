@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\JwtHelper;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\Response;
-use App\Helpers\ExceptionHelper;
 use App\Helpers\ResponseHelper;
+use App\Helpers\ExceptionHelper;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUserRequest;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller {
 
@@ -37,21 +40,21 @@ class AuthController extends Controller {
         }
     }
 
-    public function logout(Request $request) {
+    public function logout() {
         try {
-            $this->authService->logout($request);
+            $user = JwtHelper::getUserFromToken();
+            $this->authService->logout($user);
             return response(['message' => 'User logged out successfully.'], Response::HTTP_OK);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
     }
 
-    public function refreshToken() {
+    public function refreshToken(Request $request) {
         try {
-            $token = $this->authService->refreshToken();
-            return response()->json(['token' => $token]);
-        } catch (\Exception $e) {
-            return ResponseHelper::errorResponse('Could not refresh token', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+            return $this->authService->refreshToken($request);
+        } catch (\Throwable $e) {
+            return ExceptionHelper::handleException($e);
         }
     }
 }
