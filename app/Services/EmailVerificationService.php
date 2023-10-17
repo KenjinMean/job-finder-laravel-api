@@ -16,7 +16,7 @@ class EmailVerificationService {
     return response()->json(['message' => 'Email verification required.'], 403);
   }
 
-  public function verificationVerify($request, $id, $hash) {
+  public function verificationVerify($id, $hash) {
     $user = User::findOrFail($id);
     if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
       return response()->json(['message' => 'Invalid verification link.'], 403);
@@ -24,7 +24,9 @@ class EmailVerificationService {
     if (!$user->hasVerifiedEmail()) {
       $user->markEmailAsVerified();
     }
-    return response()->json(['message' => 'Email verified successfully.']);
+    // return response()->json(['message' => 'Email verified successfully.']);
+    $frontendUrl = env('FRONTEND_URL');
+    return redirect($frontendUrl);
   }
 
   # this function handle redirecting in react
@@ -51,8 +53,13 @@ class EmailVerificationService {
   //   return redirect($fullRedirectUrl);
   // }
 
-  public function verificationSend($request) {
-    $request->user()->sendEmailVerificationNotification();
+  public function verificationSend($user) {
+
+    if ($user->hasVerifiedEmail()) {
+      return response()->json(['message' => 'You are already verified.'], 200);
+    }
+
+    $user->user()->sendEmailVerificationNotification();
     return response()->json(['message' => 'Verification link sent!']);
   }
 

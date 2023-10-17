@@ -22,10 +22,19 @@ class AuthController extends Controller {
         $this->authService = $authService;
     }
 
-    public function register(RegisterUserRequest $request) {
+    // public function register(RegisterUserRequest $request) {
+    //     try {
+    //         $validatedRequest = $request->validated();
+    //         return $this->authService->register($validatedRequest);
+    //     } catch (\Exception $e) {
+    //         return ResponseHelper::errorResponse('Registration failed', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+    //     }
+    // }
+
+    public function registerUser(RegisterUserRequest $request) {
         try {
             $validatedRequest = $request->validated();
-            return $this->authService->register($validatedRequest);
+            return $this->authService->registerUser($validatedRequest);
         } catch (\Exception $e) {
             return ResponseHelper::errorResponse('Registration failed', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
@@ -45,6 +54,20 @@ class AuthController extends Controller {
             $user = JwtHelper::getUserFromToken();
             $this->authService->logout($user);
             return response(['message' => 'User logged out successfully.'], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
+    public function checkEmail(Request $request) {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+            ]);
+
+            $email = $request->input('email');
+
+            return $this->authService->checkEmailAvailability($email);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
         }

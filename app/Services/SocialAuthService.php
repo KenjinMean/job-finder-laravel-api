@@ -4,11 +4,10 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserInfo;
-use Illuminate\Http\Response;
-use App\Helpers\ResponseHelper;
+use App\Helpers\JwtHelper;
+use Illuminate\Support\Str;
+use GuzzleHttp\Psr7\Message;
 use Laravel\Socialite\Facades\Socialite;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
-
 
 class SocialAuthService {
 
@@ -23,6 +22,13 @@ class SocialAuthService {
     }
 
     public function handleProviderCallback($provider) {
+
+        $error = request('error');
+
+        if ($error === 'access_denied') {
+            return redirect(env('FRONTEND_URL') . '/login?error=' . urlencode('Access denied. Please try again.'));
+        }
+
         $socialiteUser = Socialite::driver($provider)->stateless()->user();
         $column = $provider . '_id';
         $user = User::where($column, $socialiteUser->getId())->first();
@@ -31,14 +37,12 @@ class SocialAuthService {
 
         if ($existingUser) {
             if (!$existingUser->google_id && !$existingUser->github_id) {
-                return ResponseHelper::errorResponse('This email already exists. Please log in using your email and password.', Response::HTTP_CONFLICT, "Account Conflict: Email Already taken");
+                return redirect(env('FRONTEND_URL') . '/login?error=' . urlencode('This email already exists'));
             }
             if ($existingUser->$column != $socialiteUser->getId()) {
-                return response()->json([
-                    'message' => 'This email is already associated with a ' . ($provider === 'github' ? 'Google' : 'GitHub') . ' account. Would you like to log in with ' . ($provider === 'github' ? 'Google' : 'GitHub') . ' instead?',
-                    'error' => 'Account Conflict: Email Already Linked',
-                    'provider' => $provider === 'github' ? 'google' : 'github',
-                ], Response::HTTP_CONFLICT);
+                $providerName = $provider === 'github' ? 'Google' : 'GitHub';
+                $errorMessage = "Email already associated with " . $providerName;
+                return redirect(env('FRONTEND_URL') . '/login?error=' . urlencode($errorMessage));
             }
         }
 
@@ -48,9 +52,11 @@ class SocialAuthService {
             $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
             $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
 
+            $randomPassword = Str::random(12);
+
             $user = User::create([
                 'email' => $socialiteUser->getEmail(),
-                'password' => "password",
+                'password' => bcrypt($randomPassword),
                 'email_verified_at' => now(),
                 $column => $socialiteUser->getId(),
             ]);
@@ -62,15 +68,10 @@ class SocialAuthService {
                 'cover_image' => $defaultCoverImagePath,
             ]);
         }
-        // Generate JWT token for the user
-        $jwtToken = JWTAuth::fromUser($user);
-        $user = User::with('userInfo')->find($user->id);
-        if (!$user) {
-            return response()->json(['error' => 'User not found with related UserInfo'], Response::HTTP_NOT_FOUND);
-        }
-        // Serialize the $user object into a query parameter
-        $userData = base64_encode(json_encode($user));
 
-        return redirect(env('FRONTEND_URL') . '/callback?token=' . $jwtToken . '&user=' . $userData);
+        $userData = JwtHelper::generateAccessToken($user);
+        $response = json_encode($userData);
+        $encodedResponse = urlencode($response);
+        return redirect(env('FRONTEND_URL') . '/callback?response=' . $encodedResponse);
     }
 }

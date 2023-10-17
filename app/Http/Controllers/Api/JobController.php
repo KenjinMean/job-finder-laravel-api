@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api;
 use Throwable;
 use App\Models\Job;
 use App\Services\JobService;
+use Illuminate\Http\Request;
 use App\Helpers\ExceptionHelper;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SearchJobRequest;
+use App\Http\Requests\FilterJobsRequest;
 use App\Http\Requests\StoreJobRequest;
+use App\Http\Requests\SearchJobRequest;
 use App\Http\Requests\UpdateJobRequest;
+use App\Http\Requests\UpdateJobTypeRequest;
 use App\Http\Requests\UpdateJobSkillRequest;
 
 class JobController extends Controller {
@@ -39,18 +42,28 @@ class JobController extends Controller {
         }
     }
 
-    public function show(int $jobId): JsonResponse {
+    /* Fetch job details using id */
+    // public function show(int $jobId): JsonResponse {
+    //     try {
+    //         $job = $this->jobService->showJob($jobId);
+    //         return response()->json(["job" => $job]);
+    //     } catch (Throwable $e) {
+    //         return ExceptionHelper::handleException($e);
+    //     }
+    // }
+
+    /* FETCH job details using slug */
+    public function show($jobSlug): JsonResponse {
         try {
-            $job = $this->jobService->showJob($jobId);
+            $job = $this->jobService->showJob($jobSlug);
             return response()->json(["job" => $job]);
         } catch (Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
     }
 
-    public function update(UpdateJobRequest $request, int $jobId) {
+    public function update(UpdateJobRequest $request, Job $job) {
         try {
-            $job = Job::findOrFail($jobId);
             $this->authorize("update", $job);
             $validatedRequest = $request->validated();
             $this->jobService->updateJob($validatedRequest, $job);
@@ -60,9 +73,8 @@ class JobController extends Controller {
         }
     }
 
-    public function destroy(int $jobId) {
+    public function destroy(Job $job) {
         try {
-            $job = Job::findOrFail($jobId);
             $this->authorize('delete', $job);
             $this->jobService->deleteJob($job);
             return response()->json(["message" => "Job deleted successfully"]);
@@ -71,6 +83,7 @@ class JobController extends Controller {
         }
     }
 
+    // PAGINATED JOBS by TEN
     public function getJobPostings() {
         try {
             return $this->jobService->getPaginatedJobsWithDetails();
@@ -78,6 +91,16 @@ class JobController extends Controller {
             return ExceptionHelper::handleException($e);
         }
     }
+
+    // FETCH JOBS by TEN
+    // public function getJobPostings(Request $request) {
+    //     try {
+    //         $page = $request->input('page', 1);
+    //         return $this->jobService->getJobPostings($page);
+    //     } catch (Throwable $e) {
+    //         return ExceptionHelper::handleException($e);
+    //     }
+    // }
 
     public function searchJobs(SearchJobRequest $request) {
         try {
@@ -89,14 +112,42 @@ class JobController extends Controller {
         }
     }
 
-    public function updateJobSkills(UpdateJobSkillRequest $request, int $jobId) {
+    public function searchJobSuggestions(Request $request) {
         try {
-            $job = Job::findOrFail($jobId);
+            $keyword = $request->query('keyword');
+            return $this->jobService->searchJobsSuggestions($keyword);
+        } catch (Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
+    public function filterJobs(FilterJobsRequest $request) {
+        try {
+            return $this->jobService->filterJobs($request);
+        } catch (Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
+    public function updateJobSkills(UpdateJobSkillRequest $request, Job $job) {
+        try {
             $this->authorize('updateJobSkill', $job);
             $skills = $request->validated()['skills'];
             $this->jobService->updateJobSkills($skills, $job);
             return response()->json([
                 "message" => "Job skills updated successfully."
+            ]);
+        } catch (Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
+    public function updateJobType(UpdateJobTypeRequest $request, Job $job) {
+        try {
+            $jobTypes = $request->validated()['job_type'];
+            $this->jobService->updateJobType($jobTypes, $job);
+            return response()->json([
+                "message" => "Job type updated successfully."
             ]);
         } catch (Throwable $e) {
             return ExceptionHelper::handleException($e);

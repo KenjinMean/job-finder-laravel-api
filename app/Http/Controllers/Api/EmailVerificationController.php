@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Helpers\ExceptionHelper;
+use App\Helpers\JwtHelper;
 use App\Http\Controllers\Controller;
 use App\Services\EmailVerificationService;
 
@@ -14,7 +15,7 @@ class EmailVerificationController extends Controller {
         $this->emailVerificationService = $emailVerificationService;
     }
 
-    # Email verification
+    # check if user email is verified
     public function verificationNotice(Request $request) {
         try {
             return $this->emailVerificationService->verificationNotice($request);
@@ -23,17 +24,19 @@ class EmailVerificationController extends Controller {
         }
     }
 
-    public  function verificationVerify(Request $request, $id, $hash) {
+    # verifies user email
+    public  function verificationVerify($id, $hash) {
         try {
-            return $this->emailVerificationService->verificationVerify($request, $id, $hash);
+            return $this->emailVerificationService->verificationVerify($id, $hash);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
     }
 
-    public function verificationSend(Request $request) {
+    public function verificationSend() {
         try {
-            return $this->emailVerificationService->verificationSend($request);
+            $user = JwtHelper::getUserFromToken();
+            return $this->emailVerificationService->verificationSend($user);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
         }

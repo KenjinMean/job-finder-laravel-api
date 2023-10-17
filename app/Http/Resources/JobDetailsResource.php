@@ -16,13 +16,14 @@ class JobDetailsResource extends JsonResource {
   public function toArray(Request $request): array {
     return [
       'id' => $this->id,
+      'slug' => $this->slug,
       'title' => $this->title,
       'description' => $this->description,
       'location' => $this->location,
       'salary' => $this->salary,
       'requirements' => $this->requirements,
       'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-      'company' => new CompanyLogoResource($this->whenLoaded('company')),
+      'company' => new CompanyResource($this->whenLoaded('company')),
       'skills' => SkillResource::collection($this->whenLoaded('skills')),
       'job_types' => JobTypeResource::collection($this->whenLoaded('jobTypes')),
     ];
