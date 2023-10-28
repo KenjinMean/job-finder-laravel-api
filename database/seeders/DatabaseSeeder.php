@@ -13,17 +13,24 @@ class DatabaseSeeder extends Seeder {
      * Seed the application's database.
      */
     public function run(): void {
-        // \App\Models\User::factory(5)->create();
+        /** Create 5 users */
+        // \App\Models\User::factory(1)->create();
 
+        /** Create single user */
         // \App\Models\User::factory()->create([
         //     'email' => 'test@example.com',
         //     'email_verified_at' => now(),
         //     'password' => 'password',
         // ]);
 
-        // \App\Models\Job::factory(40)->create();
+        /** Create 40 jobs */
+        // \App\Models\Job::factory(50)->create();
+
+        /** Create 20 company */
         // \App\Models\Company::factory(20)->create();
-        // \App\Models\UserInfo::factory(6)->create();
+
+        /** Generate UserInfo */
+        // \App\Models\UserInfo::factory(1)->create();
 
 
         # TINKER METHODS
@@ -65,7 +72,6 @@ class DatabaseSeeder extends Seeder {
         //     }
 
         # FILL job_job_types pivot table
-        // use App\Models\JobType
         // use App\Models\JobType
         // $jobs = Job::all();
         // $jobTypes = JobType::all();

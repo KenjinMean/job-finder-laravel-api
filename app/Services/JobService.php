@@ -82,10 +82,16 @@ class JobService {
       ->with('company', 'skills', 'jobTypes')
       ->orderBy('created_at', 'desc')
       ->paginate(10));
-    //throw a queryException ->orderBy('none_existing_column', 'desc')
+    //throw a queryException:->orderBy('none_existing_column', 'desc')
   }
 
   public function searchJobsSuggestions($keyword) {
+    if (empty($keyword)) {
+      return response()->json([
+        'suggestions' => [],
+      ]);
+    }
+
     $suggestions = Job::where('title', 'like', "%$keyword%")
       ->distinct()
       ->pluck('title')
