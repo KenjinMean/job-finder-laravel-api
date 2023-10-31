@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource {
@@ -17,6 +16,8 @@ class UserResource extends JsonResource {
             'email' => $this->email,
             'user_info' => [
                 'profile_image' => $this->userInfo->profile_image,
+                'first_name' => $this->userInfo->firstName,
+                'last_name' => $this->userInfo->lastName,
             ],
         ];
     }

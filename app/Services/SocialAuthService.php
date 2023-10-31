@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Helpers\JwtHelper;
 use Illuminate\Support\Str;
-use GuzzleHttp\Psr7\Message;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthService {
@@ -26,7 +25,7 @@ class SocialAuthService {
         $error = request('error');
 
         if ($error === 'access_denied') {
-            return redirect(env('FRONTEND_URL') . '/login?error=' . urlencode('Access denied. Please try again.'));
+            return redirect(env('FRONTEND_URL') . '/auth/login?error=' . urlencode('Access denied. Please try again.'));
         }
 
         $socialiteUser = Socialite::driver($provider)->stateless()->user();
@@ -37,12 +36,12 @@ class SocialAuthService {
 
         if ($existingUser) {
             if (!$existingUser->google_id && !$existingUser->github_id) {
-                return redirect(env('FRONTEND_URL') . '/login?error=' . urlencode('This email already exists'));
+                return redirect(env('FRONTEND_URL') . '/auth/login?error=' . urlencode('This email already exists'));
             }
             if ($existingUser->$column != $socialiteUser->getId()) {
                 $providerName = $provider === 'github' ? 'Google' : 'GitHub';
                 $errorMessage = "Email already associated with " . $providerName;
-                return redirect(env('FRONTEND_URL') . '/login?error=' . urlencode($errorMessage));
+                return redirect(env('FRONTEND_URL') . '/auth/login?error=' . urlencode($errorMessage));
             }
         }
 
@@ -72,6 +71,6 @@ class SocialAuthService {
         $userData = JwtHelper::generateAccessToken($user);
         $response = json_encode($userData);
         $encodedResponse = urlencode($response);
-        return redirect(env('FRONTEND_URL') . '/callback?response=' . $encodedResponse);
+        return redirect(env('FRONTEND_URL') . '/auth-provider-callback?response=' . $encodedResponse);
     }
 }
