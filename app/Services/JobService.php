@@ -60,7 +60,7 @@ class JobService {
 
   // GET paginated job
   public function getPaginatedJobsWithDetails() {
-    return JobPreliminaryResource::collection(Job::with('company', 'skills', 'jobTypes')
+    return JobPreliminaryResource::collection(Job::with('company.companySizeCategory', 'skills', 'jobTypes')
       ->orderBy('created_at', 'desc')
       ->paginate(10));
   }
