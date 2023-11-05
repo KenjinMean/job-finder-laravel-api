@@ -32,6 +32,6 @@ class Company extends Model {
     }
 
     public function companySizeCategory() {
-        return $this->belongsTo(CompanSizeCategory::class, 'company_size_id', 'id');
+        return $this->belongsTo(CompanySizeCategory::class, 'company_size_id', 'id');
     }
 }
