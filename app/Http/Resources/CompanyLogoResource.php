@@ -15,6 +15,7 @@ class CompanyLogoResource extends JsonResource {
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'company_size' => $this->companySizeCategory->size,
             'company_logo' => $this->company_logo,
         ];
     }
