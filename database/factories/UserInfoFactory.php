@@ -16,27 +16,17 @@ class UserInfoFactory extends Factory {
      * @return array<string, mixed>
      */
     public function definition(): array {
-
         return [
-            'headline' => fake()->sentence,
-            'firstName' => fake()->firstName,
-            'lastName' => fake()->lastName,
-            'additionalName' => fake()->firstName,
-            'pronouns' => fake()->randomElement(['he/him', 'she/her']),
-            'about' => fake()->paragraph(),
-            'location' => fake()->city,
-            'profile_image' => fake()->imageUrl(),
-            'cover_image' => fake()->imageUrl(),
-            'user_id' => function () {
-                $existingUserIds = UserInfo::pluck('user_id')->all();
-                $nonExistingUserIds = User::whereNotIn('id', $existingUserIds)->pluck('id')->all();
-
-                if (empty($nonExistingUserIds)) {
-                    return null;
-                }
-
-                return $this->faker->unique()->randomElement($nonExistingUserIds);
-            },
+            'headline' => $this->faker->sentence,
+            'firstName' => $this->faker->firstName,
+            'lastName' => $this->faker->lastName,
+            'additionalName' => $this->faker->firstName,
+            'pronouns' => $this->faker->randomElement(['he/him', 'she/her']),
+            'about' => $this->faker->paragraph,
+            'location' => $this->faker->city,
+            'profile_image' => $this->faker->imageUrl(),
+            'cover_image' => $this->faker->imageUrl(),
+            'user_id' => User::all()->random()->id,
         ];
     }
 }
