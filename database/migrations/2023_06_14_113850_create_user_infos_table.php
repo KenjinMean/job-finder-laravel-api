@@ -15,11 +15,10 @@ return new class extends Migration {
             $table->string('firstName')->nullable();
             $table->string('lastName')->nullable();
             $table->string('additionalName')->nullable();
-            $table->string('pronouns')->nullable();
             $table->text('about')->nullable();
-            $table->string('location')->nullable();
             $table->string('profile_image')->nullable();
             $table->string('cover_image')->nullable();
+            $table->string('birthday')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

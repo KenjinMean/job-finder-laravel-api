@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Skill;
 use App\Models\Company;
+use App\Models\UserEducation;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -79,4 +80,18 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject {
     public function userInfo() {
         return $this->hasOne(UserInfo::class);
     }
+
+    public function userEducations() {
+        return $this->hasMany(UserEducation::class);
+    }
+
+    public function userWebsites() {
+        return $this->hasMany(UserWebsite::class);
+    }
+
+    public function userContacts() {
+        return $this->hasOne(UserContact::class);
+    }
+
+    // clearly define relationships to the newly created models
 }
