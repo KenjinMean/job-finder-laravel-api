@@ -41,7 +41,7 @@ class UserController extends Controller {
         try {
             $user = JwtHelper::getUserFromToken();
             $this->authorize('view', $user);
-            $response = $this->userService->getUser();
+            $response = $this->userService->getUser($user);
             return response()->json(["user" => $response]);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);

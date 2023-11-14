@@ -9,12 +9,17 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up(): void {
-        Schema::create('skill_user', function (Blueprint $table) {
+        Schema::create('user_work_experiences', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('skill_id')->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->string('company_name');
+            $table->string('job_title');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->string('location');
+            $table->longText('description');
+            $table->boolean('is_current');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('skill_id')->references('id')->on('skills')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -23,6 +28,6 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function down(): void {
-        Schema::dropIfExists('skill_user');
+        Schema::dropIfExists('user_work_experiences');
     }
 };

@@ -83,7 +83,6 @@ class AuthService {
         return JwtHelper::generateAccessToken($user);
     }
 
-
     public function login($validatedCredentials) {
         $user = User::where('email', $validatedCredentials['email'])->first();
         if ($user) {

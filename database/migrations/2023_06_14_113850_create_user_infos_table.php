@@ -11,17 +11,19 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('user_infos', function (Blueprint $table) {
             $table->id();
-            $table->string('headline')->nullable();
-            $table->string('firstName')->nullable();
-            $table->string('lastName')->nullable();
-            $table->string('additionalName')->nullable();
-            $table->text('about')->nullable();
-            $table->string('profile_image')->nullable();
-            $table->string('cover_image')->nullable();
-            $table->string('birthday')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('headline')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('additional_name')->nullable();
+            $table->longText('about')->nullable();
+            $table->text('profile_image')->nullable();
+            $table->text('cover_image')->nullable();
+            $table->text('resume')->nullable();
+            $table->date('birth_date')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

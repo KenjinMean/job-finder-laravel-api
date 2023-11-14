@@ -16,14 +16,16 @@ class UserInfoFactory extends Factory {
      */
     public function definition(): array {
         return [
+            'user_id' => User::all()->random()->id,
             'headline' => $this->faker->sentence,
-            'firstName' => $this->faker->firstName,
-            'lastName' => $this->faker->lastName,
-            'additionalName' => $this->faker->firstName,
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'additional_name' => $this->faker->firstName,
             'about' => $this->faker->paragraph,
             'profile_image' => $this->faker->imageUrl(),
             'cover_image' => $this->faker->imageUrl(),
-            'user_id' => User::all()->random()->id,
+            'resume' => $this->faker->url(),
+            'birth_date' => $this->faker->date(),
         ];
     }
 }

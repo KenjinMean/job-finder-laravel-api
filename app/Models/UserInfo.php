@@ -14,16 +14,16 @@ class UserInfo extends Model {
      * @var array<int, string>
      */
     protected $fillable = [
-        "firstName",
-        "lastName",
+        "first_name",
+        "last_name",
         "headline",
-        "additionalName",
-        "pronouns",
+        "additional_name",
         "about",
-        "location",
         "user_id",
         "profile_image",
         "cover_image",
+        'resume',
+        "birth_date",
     ];
 
     public function user() {

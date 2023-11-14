@@ -74,7 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject {
     }
 
     public function skills() {
-        return $this->belongsToMany(Skill::class, 'user_skill')->withTimestamps();
+        return $this->belongsToMany(Skill::class, 'skill_user')->withTimestamps();
     }
 
     public function userInfo() {
@@ -93,5 +93,7 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject {
         return $this->hasOne(UserContact::class);
     }
 
-    // clearly define relationships to the newly created models
+    public function userWorkExperiences() {
+        return $this->hasMany(UserWorkExperience::class);
+    }
 }

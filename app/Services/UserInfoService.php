@@ -4,10 +4,12 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\UserProfileResource;
 
 class UserInfoService {
   public function showUserInfo($user) {
-    return $user->userInfo;
+    // return $user->userInfo;
+    return new UserProfileResource($user->load('userInfo', 'skills'));
   }
 
   public function updateUserInfo($userInfo, $validatedRequest) {

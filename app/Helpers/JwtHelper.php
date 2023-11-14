@@ -3,8 +3,8 @@
 
 namespace App\Helpers;
 
+use App\Http\Resources\LoginResource;
 use App\Models\User;
-use App\Http\Resources\UserResource;
 use App\Services\RefreshTokenGenerator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
@@ -21,7 +21,7 @@ class JwtHelper {
   public static function generateAccessToken($user) {
     $token = JWTAuth::fromUser($user);
     $user->load('userInfo');
-    $userResource = new UserResource($user);
+    $userResource = new LoginResource($user);
     $expiresInMinutes = JWTAuth::factory()->getTTL() * 60;
 
     return response()->json([
@@ -46,7 +46,7 @@ class JwtHelper {
     $token = JWTAuth::fromUser($user);
     $refreshToken = RefreshTokenGenerator::generateRefreshToken($user);
     $user->load('userInfo');
-    $userResource = new UserResource($user);
+    $userResource = new LoginResource($user);
     $expiresInMinutes = 30 * 24 * 60; // 30 days
 
     return response()->json([
