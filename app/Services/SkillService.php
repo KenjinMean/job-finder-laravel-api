@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Skill;
 use App\Http\Resources\SkillResource;
+use Error;
 
 class SkillService {
   public function getSkills() {
@@ -18,9 +20,9 @@ class SkillService {
     return Skill::findOrFail($skillId);
   }
 
-  public function updateSkill($skill, $validatedRequest): void {
-    $skill->update($validatedRequest);
-  }
+  // public function updateSkill($skill, $validatedRequest): void {
+  //   $skill->update($validatedRequest);
+  // }
 
   public function deleteSkill($skill): void {
     $skill->delete();
@@ -32,5 +34,32 @@ class SkillService {
       ->get();
 
     return SkillResource::collection($skills);
+  }
+
+  public function updateSkill($user, $skillId) {
+    $userId = $user->id;
+    return response()->json(["skill" => $skillId, "user" => $userId]);
+  }
+
+  public function addSkill($user, $skillId) {
+    try {
+      Skill::findOrFail($skillId);
+      $user->skills()->attach($skillId);
+
+      return response()->json(["message" => "Skills added successfully"]);
+    } catch (\Throwable $e) {
+      throw new \Exception($e->getMessage());
+    }
+  }
+
+  public function removeSkill($user, $skillId) {
+    try {
+      Skill::findOrFail($skillId);
+      $user->skills()->detach($skillId);
+
+      return response()->json(["message" => "Skills removed successfully"]);
+    } catch (\Throwable $e) {
+      throw new \Exception($e->getMessage());
+    }
   }
 }

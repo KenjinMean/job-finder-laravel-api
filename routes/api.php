@@ -131,4 +131,6 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
     # SKILL ROUTES
     Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
+    Route::patch('update-skills', [SkillController::class, 'addSkill'])->name('skills.update-skill');
+    Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
 });

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Skill;
+use App\Helpers\JwtHelper;
 use App\Services\SkillService;
 use App\Helpers\ExceptionHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SearchSkillRequest;
+use App\Http\Requests\AddSkillRequest;
 use App\Http\Requests\StoreSkillRequest;
+use App\Http\Requests\SearchSkillRequest;
 use App\Http\Requests\UpdateSkillRequest;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,17 +51,17 @@ class SkillController extends Controller {
         }
     }
 
-    public function update(UpdateSkillRequest $request, $skillId) {
-        try {
-            $skill = Skill::findOrFail($skillId);
-            $validatedRequest = $request->validated();
-            $this->authorize('update', $skill);
-            $this->skillService->updateSkill($skill, $validatedRequest);
-            return response()->json(["message" => "Skill updated successfully"]);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
+    // public function update(UpdateSkillRequest $request, $skillId) {
+    //     try {
+    //         $skill = Skill::findOrFail($skillId);
+    //         $validatedRequest = $request->validated();
+    //         $this->authorize('update', $skill);
+    //         $this->skillService->updateSkill($skill, $validatedRequest);
+    //         return response()->json(["message" => "Skill updated successfully"]);
+    //     } catch (\Throwable $e) {
+    //         return ExceptionHelper::handleException($e);
+    //     }
+    // }
 
     public function destroy($skillId) {
         try {
@@ -74,10 +76,29 @@ class SkillController extends Controller {
 
     public function searchSkill(SearchSkillRequest $request) {
         try {
-            $validatedData = $request->validated();
-            $keyword = $validatedData['keyword'];
+            $keyword = $request->validated()['keyword'];
             $skill = $this->skillService->searchSkill($keyword);
             return response()->json(["skills" => $skill]);
+        } catch (\Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
+    public function addSkill(AddSkillRequest $request) {
+        try {
+            $user = JwtHelper::getUserFromToken();
+            $skillId = $request->validated()['skill_id'];
+            return $this->skillService->addSkill($user, $skillId);
+        } catch (\Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
+    public function removeSkill(AddSkillRequest $request) {
+        try {
+            $user = JwtHelper::getUserFromToken();
+            $skillId = $request->validated()['skill_id'];
+            return $this->skillService->removeSkill($user, $skillId);
         } catch (\Throwable $e) {
             return ExceptionHelper::handleException($e);
         }
