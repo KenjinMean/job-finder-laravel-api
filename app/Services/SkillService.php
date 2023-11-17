@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use Error;
 use App\Models\User;
 use App\Models\Skill;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\SkillResource;
-use Error;
 
 class SkillService {
   public function getSkills() {
@@ -29,10 +30,15 @@ class SkillService {
   }
 
   public function searchSkill($keyword) {
-    $skills = Skill::where('name', 'like', "%{$keyword}%")
-      ->orderBy('created_at', 'desc')
-      ->get();
-
+    if (empty($keyword) || is_null($keyword) || strlen($keyword) < 2) {
+      // If the keyword is empty, null, or less than 2 characters, return all skills
+      $skills = Skill::orderBy('created_at', 'desc')->take(10)->get();
+    } else {
+      // If the keyword is provided and has at least 2 characters, perform the search
+      $skills = Skill::where('name', 'like', "%{$keyword}%")
+        ->orderBy('created_at', 'desc')
+        ->get();
+    }
     return SkillResource::collection($skills);
   }
 
@@ -43,6 +49,12 @@ class SkillService {
 
   public function addSkill($user, $skillId) {
     try {
+
+      if ($user->skills()->where('skill_id', $skillId)->exists()) {
+
+        throw new \Exception('Skill is already associated with the user.');
+      }
+
       Skill::findOrFail($skillId);
       $user->skills()->attach($skillId);
 
@@ -59,6 +71,25 @@ class SkillService {
 
       return response()->json(["message" => "Skills removed successfully"]);
     } catch (\Throwable $e) {
+      throw new \Exception($e->getMessage());
+    }
+  }
+
+  // remove skills based on array of skills provided
+  public function removeSkills($user, $skillIds) {
+    try {
+      DB::beginTransaction();
+
+      foreach ($skillIds as $skillId) {
+        Skill::findOrFail($skillId);
+        $user->skills()->detach($skillId);
+      }
+
+      DB::commit();
+
+      return response()->json(["message" => "Skills removed successfully"]);
+    } catch (\Throwable $e) {
+      DB::rollBack();
       throw new \Exception($e->getMessage());
     }
   }
