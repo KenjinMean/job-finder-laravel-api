@@ -19,7 +19,7 @@ class AddSkillRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            "skill_id" => "int"
+            "skill_id" => "required|integer",
         ];
     }
 }

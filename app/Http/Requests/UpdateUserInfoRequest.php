@@ -19,10 +19,10 @@ class UpdateUserInfoRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            "firstName" => "string|nullable",
-            "lastName" => "string|nullable",
+            "first_name" => "string|nullable",
+            "last_name" => "string|nullable",
             "headline" => "string|nullable",
-            "additionalName" => "string|nullable",
+            "additional_name" => "string|nullable",
             "pronouns" => "string|nullable",
             "about" => "string|nullable",
             "location" => "string|nullable",

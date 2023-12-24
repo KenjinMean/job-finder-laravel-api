@@ -4,27 +4,44 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\UserProfileResource;
+use App\Http\Resources\UserInfoResource;
 
 class UserInfoService {
   public function showUserInfo($user) {
-    // return $user->userInfo;
-    return new UserProfileResource($user->load('userInfo', 'skills'));
+    $userInfo = $user->userInfo;
+
+    if (!$userInfo) {
+      return response()->json(['error' => 'User info not found'], 404);
+    }
+
+    return new UserInfoResource($userInfo);
   }
 
-  public function updateUserInfo($userInfo, $validatedRequest) {
+  public function updateUserInfo($user, $validatedRequest) {
+    $userInfo = $user->userInfo;
+
     $userInfo->update([
-      'firstName' => $validatedRequest['firstName'],
-      'lastName' => $validatedRequest['lastName'],
-      'headline' => $validatedRequest['headline'],
-      'additionalName' => $validatedRequest['additionalName'],
-      'pronouns' => $validatedRequest['pronouns'],
-      'about' => $validatedRequest['about'],
-      'location' => $validatedRequest['location'],
+      'first_name' => $validatedRequest['first_name'] ?? null,
+      'last_name' => $validatedRequest['last_name'] ?? null,
+      'headline' => $validatedRequest['headline'] ?? null,
+      'additional_name' => $validatedRequest['additional_name'] ?? null,
+      'pronouns' => $validatedRequest['pronouns'] ?? null,
+      'about' => $validatedRequest['about'] ?? null,
+      'location' => $validatedRequest['location'] ?? null,
     ]);
   }
 
   # NOTE can refactor this update profile image to update cover image
+  private function deleteOldProfileImage($oldProfileImage) {
+    // Extract the path from the old image URL
+    $oldProfileImage = str_replace('storage/', '', $oldProfileImage);
+
+    // Delete the old image if not default image
+    if ($oldProfileImage !== 'user_profile_images/default-avatar.png') {
+      Storage::disk('public')->delete($oldProfileImage);
+    }
+  }
+
   public function updateProfileImage($user, $validatedRequest) {
     try {
       $path = null;
@@ -35,6 +52,7 @@ class UserInfoService {
         // New image is provided
         $path = Storage::disk('public')->put('user_profile_images', $validatedRequest['profile_image']);
         $path = 'storage/' . str_replace('\\', '/', $path);
+        $this->deleteOldProfileImage($oldProfileImage);
         $user->userInfo->update([
           'profile_image' => $path,
         ]);
@@ -57,6 +75,16 @@ class UserInfoService {
     }
   }
 
+  private function deleteOldCoverImage($oldCoverImage) {
+    // Extract the path from the old image URL
+    $oldCoverImage = str_replace('storage/', '', $oldCoverImage);
+
+    // Delete the old image if not default image
+    if ($oldCoverImage !== 'user_cover_images/default-cover.jpg') {
+      Storage::disk('public')->delete($oldCoverImage);
+    }
+  }
+
   public function updateCoverImage($user, $validatedRequest) {
     try {
       $path = null;
@@ -67,6 +95,7 @@ class UserInfoService {
         // New image is provided
         $path = Storage::disk('public')->put('user_cover_images', $validatedRequest['cover_image']);
         $path = 'storage/' . str_replace('\\', '/', $path);
+        $this->deleteOldCoverImage($oldCoverImage);
         $user->userInfo->update([
           'cover_image' => $path,
         ]);

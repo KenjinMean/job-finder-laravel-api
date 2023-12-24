@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use Error;
-use App\Models\User;
 use App\Models\Skill;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\SkillResource;
@@ -29,9 +27,14 @@ class SkillService {
     $skill->delete();
   }
 
+  public function getUserSkills($user) {
+    $skills = $user->skills;
+    return SkillResource::collection($skills);
+  }
+
   public function searchSkill($keyword) {
     if (empty($keyword) || is_null($keyword) || strlen($keyword) < 2) {
-      // If the keyword is empty, null, or less than 2 characters, return all skills
+      // If the keyword is empty, null, or less than 2 characters, return 10 suggestions skills
       $skills = Skill::orderBy('created_at', 'desc')->take(10)->get();
     } else {
       // If the keyword is provided and has at least 2 characters, perform the search

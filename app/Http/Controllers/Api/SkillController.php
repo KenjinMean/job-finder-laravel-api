@@ -74,6 +74,16 @@ class SkillController extends Controller {
         }
     }
 
+    public function getUserSkills() {
+        try {
+            $user = JwtHelper::getUserFromToken();
+            $skill = $this->skillService->getUserSkills($user);
+            return response()->json(["skills" => $skill]);
+        } catch (\Throwable $e) {
+            return ExceptionHelper::handleException($e);
+        }
+    }
+
     public function searchSkill(SearchSkillRequest $request) {
         try {
             $keyword = $request->validated()['keyword'];

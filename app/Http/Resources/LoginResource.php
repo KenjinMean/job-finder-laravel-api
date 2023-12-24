@@ -19,6 +19,7 @@ class LoginResource extends JsonResource {
                 'profile_image' => $this->userInfo->profile_image,
                 'first_name' => $this->userInfo->first_name,
                 'last_name' => $this->userInfo->last_name,
+                'headline' => $this->userinfo->headline,
             ],
         ];
     }

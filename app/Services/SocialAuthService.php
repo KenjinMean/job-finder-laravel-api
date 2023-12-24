@@ -71,6 +71,6 @@ class SocialAuthService {
         $userData = JwtHelper::generateAccessToken($user);
         $response = json_encode($userData);
         $encodedResponse = urlencode($response);
-        return redirect(env('FRONTEND_URL') . '/auth-provider-callback?response=' . $encodedResponse);
+        return redirect(env('FRONTEND_URL') . '/job-finder-react-frontend/auth/auth-provider-callback?response=' . $encodedResponse);
     }
 }

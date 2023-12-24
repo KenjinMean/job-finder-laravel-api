@@ -116,21 +116,22 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 Route::middleware(['auth:api'])->group(function () {
     Route::prefix('user-infos')->group(function () {
         Route::get('/show', [UserInfoController::class, 'show'])->name('user-infos.show');
+        Route::patch('/update', [UserInfoController::class, 'update'])->name('user-infos.update');
     });
+
+    # SKILL ROUTES
+    Route::get('get-user-skills', [SkillController::class, 'getUserSkills'])->name('skills.get-user-skills');
+    Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
+    Route::post('add-skill', [SkillController::class, 'addSkill'])->name('skills.update-skill');
+    Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
 });
 
 # VERIFIED USER-INFO ROUTES
 Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::prefix('user-infos')->group(function () {
         Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
-        Route::put('/update', [UserInfoController::class, 'update'])->name('user-infos.update');
         Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
         Route::patch('/update-profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile');
         Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
     });
-
-    # SKILL ROUTES
-    Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
-    Route::post('add-skill', [SkillController::class, 'addSkill'])->name('skills.update-skill');
-    Route::delete('remove-skills', [SkillController::class, 'removeSkills'])->name('skills.remove-skills');
 });

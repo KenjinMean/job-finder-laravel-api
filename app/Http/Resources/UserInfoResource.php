@@ -15,9 +15,9 @@ class UserInfoResource extends JsonResource {
         return [
             'id' => $this->id,
             'headline' => $this->headline,
-            'first_name' => $this->firstName,
-            'last_name' => $this->lastName,
-            'additional_name' => $this->additionalName,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'additional_name' => $this->additional_name,
             'about' => $this->about,
             'profile_image' => $this->profile_image,
             'cover_image' => $this->cover_image,
