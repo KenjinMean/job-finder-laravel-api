@@ -21,13 +21,12 @@ class UserInfoService {
     $userInfo = $user->userInfo;
 
     $userInfo->update([
-      'first_name' => $validatedRequest['first_name'] ?? null,
-      'last_name' => $validatedRequest['last_name'] ?? null,
-      'headline' => $validatedRequest['headline'] ?? null,
-      'additional_name' => $validatedRequest['additional_name'] ?? null,
-      'pronouns' => $validatedRequest['pronouns'] ?? null,
-      'about' => $validatedRequest['about'] ?? null,
-      'location' => $validatedRequest['location'] ?? null,
+      'first_name' => $validatedRequest['first_name'] ?? "",
+      'last_name' => $validatedRequest['last_name'] ?? "",
+      'headline' => $validatedRequest['headline'] ?? "",
+      'additional_name' => $validatedRequest['additional_name'] ?? "",
+      'pronouns' => $validatedRequest['pronouns'] ?? "",
+      'about' => $validatedRequest['about'] ?? "",
     ]);
   }
 

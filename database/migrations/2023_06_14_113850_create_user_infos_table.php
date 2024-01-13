@@ -20,7 +20,6 @@ return new class extends Migration {
             $table->text('profile_image')->nullable();
             $table->text('cover_image')->nullable();
             $table->text('resume')->nullable();
-            $table->date('birth_date')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

@@ -112,7 +112,10 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     });
 });
 
-# USER INFO ROUTES
+//PUBLIC USER INFO ROUTES
+
+
+# PRIVATE USER INFO ROUTES
 # UNVERIFIED USER-INFO ROUTES
 Route::middleware(['auth:api'])->group(function () {
     Route::prefix('user-infos')->group(function () {

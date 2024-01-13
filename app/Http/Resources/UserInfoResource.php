@@ -22,7 +22,6 @@ class UserInfoResource extends JsonResource {
             'profile_image' => $this->profile_image,
             'cover_image' => $this->cover_image,
             'resume' => $this->resume,
-            'birth_date' => $this->birthday,
         ];
     }
 }

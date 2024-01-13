@@ -25,7 +25,6 @@ class UserInfoFactory extends Factory {
             'profile_image' => $this->faker->imageUrl(),
             'cover_image' => $this->faker->imageUrl(),
             'resume' => $this->faker->url(),
-            'birth_date' => $this->faker->date(),
         ];
     }
 }

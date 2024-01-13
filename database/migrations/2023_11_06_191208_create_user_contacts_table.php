@@ -12,13 +12,12 @@ return new class extends Migration {
         Schema::create('user_contacts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->string('address')->nullable();
             $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('zip_code')->nullable();
+            $table->string('province')->nullable();
             $table->string('country')->nullable();
+            $table->string('zip_code')->nullable();
+            $table->date('birth_date')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
