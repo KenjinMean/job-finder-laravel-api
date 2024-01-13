@@ -16,17 +16,15 @@ class UserContactFactory extends Factory {
      */
     public function definition(): array {
         $user = User::inRandomOrder()->first();
-        $email = $user->email;
 
         return [
-            'email' => $email,
-            'phone' => $this->faker->phoneNumber(),
-            'address' => $this->faker->address(),
-            'city' => $this->faker->city(),
-            'state' => $this->faker->city(),
-            'zip_code' => $this->faker->countryCode(),
-            'country' => $this->faker->country(),
             'user_id' => $user->id,
+            'phone' => $this->faker->phoneNumber(),
+            'city' => $this->faker->city(),
+            'province' => $this->faker->city(),
+            'country' => $this->faker->country(),
+            'zip_code' => $this->faker->postcode(),
+            'birth_date' => $this->faker->date(),
         ];
     }
 }

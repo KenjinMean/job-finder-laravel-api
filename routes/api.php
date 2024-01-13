@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\UserInfoController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\UserContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,4 +135,10 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
         Route::patch('/update-profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile');
         Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
     });
+});
+
+// USER CONTACT ROUTES
+Route::prefix('user-contact')->group(function () {
+    Route::get('/show', [UserContactController::class, 'show'])->name('user-contact.show');
+    Route::patch('/update', [UserContactController::class, 'update'])->name('user-contact.update');
 });
