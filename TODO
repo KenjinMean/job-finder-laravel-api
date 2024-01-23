@@ -1,0 +1,305 @@
+Todo list
+make a Latest Job Posting:
+
+## NOTE: Add this to user info's
+
+Profile Picture
+Contact Information
+Resume or CV
+Location
+Skills and Experience
+Job Preferences
+
+## CURRENT:1
+
+-create some ci / cd for qualifications and update skills table add more skills
+
+-update phone regex pattern
+-load the image not using imageLoaderUtil because of flashing
+-change moment library for smaller library
+-contact edit form not lazy loaded
+-fix jobDetails layout
+-make a single fallback loading for all lazy loading pages to save more data
+-add tailwind custom accent color
+-fix modals util to have a lazy loadig built in
+-lazy load the modals and use single loader for some lazy loading
+
+-include useModalScrollLock on use Overlays or seperate modal functions to dialog functions
+
+-make the app layout render the header again to avoid rerendering of the header every page
+-header rerenders on every layout
+
+-fix userInfoComponent layout
+-add lazy loading for each section and fetch each section on intersect on viewport
+
+-if unauthorized and token is not valid delete token and reload
+-fix the errorboundary catch the network error but not displaying error page
+
+-good barrel exports https://blog.logrocket.com/using-barrel-exports-organize-react-components/
+-can choose between success and error view or toast notification
+
+-resume section
+-contact section
+-user profile section
+-skill section
+-education section
+-websites section
+4
+
+-saved searches table
+-user wizard form for completing user info on user profile
+-register for employer - or add switch role on profile menu
+-store formatted text in databse and retrieve it as it was saved
+-handle resume upload
+-create seperate forms for userInfo, upload profile/cover, etc for app registration steps
+-reuse profile completion steps when updating user
+-seperate registration, first verify email and password after verified redirect to steps to complete profile but skipable, see if yoyu can use url parameter to determine which steps is the user in registration
+-create a flowchart of how user email verification steps
+-simplify the code on email verification controller and services/ use dependency injection if possible
+-handling register email verification wether to wait for verification of email before redirecting to app or redirect to app immediately
+-handle loading animation during pressing login or loging in using social providers and button disable
+-try fixing the layout jump because of scrollbar gutter
+
+-handle redirection to search rtesult with the optional filters
+-setup job filter
+
+-fetch all skill, put inside a select then let user select and put inside array to be sent to api. let user remove selected skill
+-change user registration with name or create another view for firstname and lastname input
+-make user registration as email and password only
+-user select skill page or popup dialogue
+-apply for a job (send the company an email)
+-when registering a user give them choices on job category they want
+-then give them job suggestion based on the category they chosen
+-optional use an api when registering for company location
+-make a dropdown link from 'post a job' that gets the all company associated with the user
+-after clicking a company redirect the user to the post a job page and save the company id on a state to use for sending post request to server
+-add a skills and job tags
+-add category_id on jobs table link category_table
+
+NEXT: notify a user when a job is posted that has the same category as the user
+
+FINISHED:
+-make a create a job page,
+-start with implemnting a user controller that returns all company associated with user
+-implement logout
+-fetch company associated with user and use on select option
+-add category table
+-establishing relationship between user and skill with pivot table user_skills
+-make user-info table
+-establishing relationship between user and user_info
+-setup edit user_info page
+-retrieve user info on edit user info pageload
+-implement update userInfo
+-make an update account page
+-when updating profile/cover delete the old profile/cover if its not a default profile/cover
+-handle edit user profile and cover
+-make profile page
+-setup job skill when registering jobs
+-routes for fetching jobs eagerload company and skills
+-routes for fetching all skills
+-search for matching jobs
+-configured finished company controller
+-refactor company controller to use company service
+-FIX update company image not deleting old image if not default when updating image
+-implement authorization for job update and delete.
+-differenciate between getAllJobs without related relationships and getJobs for job posting
+-refactor job controller to use job service
+-finish the job controller
+-handle queryException to all controller
+-implement UserService on user controller
+-delete the unused JobSkillPolicy
+-rename jobPreliminaryResource to jobPartialResource
+-fix axios-client when token has expired then token refresh failed with token has been blacklisted redirect to guest layout
+-craete a jsx component that recieves image url then render image wether the iamge has prepend of http or not
+-fine tune the redirects
+-handle redirect to home when verifying from email
+-make route methods meaningfull like the job routes and company routes
+-refactor all controller to use Service class to seperate business logic, CURRENT Company Controller
+-finish all function in Job Controller, Company Controller
+-finish update function on all controller
+-update email verification routes, on /email/verify/{id}/{hash} check to add expiration on email link, and redirect to react frontend or generate a user UI that says email is verified successfully after clicking.
+-recreate job-finder-laravel-api to use register and socialite
+-use laravel socialite for login
+-FIX in the RegisterUserRequest fix the email, remove usinque and put custom check on the AuthService
+-FIX login method where user should not log in the email in auth service because it has no password
+-FIX the $user = Auth::user() instances to  $token = JWTAuth::getToken();
+                                            $user = JWTAuth::toUser($token);
+to get the user associated with the token.
+-add token refresh mechanism
+-create register page
+-remove posted_at field on jobs table
+-only make searchbar show on joblist
+-delete the name field on users table, let user infos table handle it
+-handle user registration after validating with socialite
+-use laravel depency injection instead of findOrFail()
+-FIX login methods cases where if user registered but the email used was registerd using different service, response with something like this emai lis alredy used by "github/google" authenticate with "github/google" instead.
+-FIX if user logged in github email but the same email existed using google and vice versa
+-IMPLEMENT use user githb or google image and other infos
+make a post a job page:
+-live search skill field with debouncing and throtling
+-on create company page: include upload image. create another migration to add company image
+-implement update company image
+-can add auth services like google or github
+-change of plans use previous implementation where store access_token in localstorage
+-how to handle refresh token expiration in frontend
+-can remove work_location table in model and migration
+-currently implemenmted work location but it is on job_job_type instead of job_work_location
+-currently working on font, dont include login in font-primary
+-add job_type on jobs table: "Full-Time", "Part-Time", "Contract", "Temporary", "Internship", "Remote", "On-Site", "Hybrid", "Client-Site", "Other"
+-fix job search that implements suggestion everytime you type and uses debouce
+-fix searchbar layout and suggetions
+-handle the search suggestions click to fetch the jobs
+-instead of passing the whole job.data pass the id to jobDetailsColumn then fetch the related jobInfo
+-two column layout where it automatically loads the first kjob details on the second layout and gets the subsequent from user click, IDEA: make a nested outlet in the xl:size then do routing
+-use debounce function to delay the onBlur function so the user has time to click the search Suggestion before it hides
+-fix the layout of the job posting to make the detail has the max height of the screen while letting the jobs overflow
+-remove silent refresh-token setTimeout when loggin-out
+-fix fetch job using slug when clicking for job details
+-fix router the default url of the website is currently set to http://localhost:3000/jobs/search should be http://localhost:3000/jobs
+-fine tune guest and app? layout, guest should have job posting and login only header and in log
+-implement pagination (optional because frontend is still not finished)
+
+-make an image container component that recieves image url then renders the image
+-when searching and clicking search suggestions fix the history so the user can navigate back
+-fix copy pasting url works only on 720screen below
+-fix github or google already taken account error handling
+-error animation
+-fix different errors from loggin in(currently showing only 1 error for all errors)
+-use headless ui menu and menu.item on searchsuggestion dropdown
+-creating the single page for HomePage or Dashboard
+-Navigate user to profile-completion-steps after registering,
+-refactor login methods using the customHook useAuthRequestHandler hook
+-define onSuccess and/or onError of the loginMutation on the custom hook because the login page is the only one using it: NOTE: cannot define there because customhooks can only be used in the component calling it(useLocation)
+-rename the authSuccess used by github and google auth to avoid confusion
+-get user id and set it to user state context, thenuse it as a unique id for the get-user-info reactQuery for a uniqueness and avoid showing the cache data to another user opn login
+-already extracted user id from api, implement on frontend
+-fix bug where if you came from user profile then you go to 404 page then go back again to user profile ann error will occur like failed to authenticate token
+-follow this react naming convention, componenets, pages, views, utils, layouts
+-rename all page component to use react component naming convention - currently on pages
+-handled token has been blacklisted error when refreshing the page inside user-info page by targetting specific axios request to refresh-token only on the interceptor
+-on combinong the guestheader and memberheader the infinite refresh comes from the header mount calls the refreshtoken function, need to call the refresh only on login
+-add a hide transition effect when the heroBanner and the filterSearchBar component unmount
+-fix the directories and folder structure/ put layout-components on layout folder, views on views folder, etc. auth login is finished moving
+-paginate the search result
+-create a parent for auth with login as default route
+-try implement useQuery infiniteQuery
+-handling errors on login and register page using queryboundary component, find a way to catch error on useMutation
+-handle error produced by component, errorBoundary - watch dave gray on youtube
+-reseed the database
+-create fallback loading component for each pages, login and register
+-fix the suggestion on filterSearchbar to match the width of the component
+-fix autocompletesearchbar mobile view
+-fix header to be responsive
+-design error pages, on ErrorPage component conditionally render errorViews based on what type of error occured
+-fix login and register container to grow on content size
+-create a max-width component that contains every component that needs max-width
+-fix the conditional render of the user when in lg:screen not justifying between. treatingas there is still element there
+-show/hide user menu wether if user is logged in or no
+-fix header mobile burger menu view
+-creating the factory for each tinker methods seeder
+-create the company size table
+-fix seeders to automatically seed the pivot table per data
+-finalize database info on jobs, user, and companies
+-use number base company-size instead of company-category
+-display company size on JobContainer.View
+-reset migration and rerun seeder because there is a changes in migrations
+-add work experiences table
+-seperations of concerns react pattern on login page component
+-fix folder structure moving folders
+-change the Link to="/" to Link to="/jobs" to properly push to history
+-make modal pop up using react router
+-creating modal and using jotai as state management
+-fix header that every mount it refreshes token because rendered in every layout
+-migrate user views to user component
+-move auth layout inside main router? because you can freely render header or footer now
+-seperate lazy on router and put it in component directly to clean router of susoense clutter source https://github.com/nz-m/SocialEcho/blob/main/client/src/pages/Post.jsx
+-copy best folder structure
+-integrate addskill in the user skills view instead of modal
+-refactor AutocompleteSearcbarV2 and searchsuggestionlist to accept array of title only not object
+-test refreshtoken functionality ion new authprovider component
+-move zustatnd state to services then state folder
+-move any provider/wrapper to provider folder, e.g authprovider errorboundary?
+-move apiRequestHandlesr to api?
+-determine on usehooks fucntions if it can be considered as util function like isNew, formatter string to int
+-fix registering non valid email is accepted on api
+-fix register component scrolling and functions
+-update register to use the zustand authenticationStore
+-create an AuthenticationStates to replace contextProvider
+-centralized the logout function so that when calling logout no need to provide any extra functions
+-check onlogout the setIsRefreshingToken
+-check if the useMutation has onError, then put the setError there to avoid useEffect
+-guard the user on login page navigate to home
+-handle lazy import of modals in router
+-create store for login
+-user fetch states
+-test refresh token time to refresh
+-create a user store for all its information or seperate for request states
+-disable scroll when modal is open
+-can choose between loading all user data at once or loading them seperately for each table
+-handle suggestion click for saerchsuggestion and skills
+-migrate from managing auth token and user from context to zustand
+-handle error globally if no server on error boundary
+-FIX: cant type space on searchUserSkill
+-pass error mesasge on onError on addSkill then extract in the error modal component
+-prevent scroll to top not working again
+-seperate fetch for each userinfo section
+-implement toastify
+-implement profile/cover photo click to view and update
+-handle addPhoto and profile upload
+-success and error for removing
+-implement success view on add user skill
+-fix modal autoclose on click outside
+-implement toastify on update user info
+-make pages for each userAddskillmodal componment
+-create a useFetchUserSkills and fetch user skills on mount on user skills page
+-fix determine which component is for utility and standalone component vs ui component
+-fix edit user ui's
+-show image on UserProfilePreviewModalComponent and handle sending it to backend
+-fix react router scrollRestoration to not affect openig modal routes
+-close modal when clicked outside
+-handle user cover photo update
+-fix userProfileImageUpdateModals and userProfileImageUpdatePreview route to match its purpose
+-remove userInfo's on login request because already handled only return the token and userId
+-fix after updating profile image the small profile icon on header is not changing unless reloggedin
+-fix on user info edit form if sent empty it is replaced with strign null the value on database
+-add add-cover button absolute positioned button
+-style the toast notification to be on bottom right
+-prevent user from navigating to update image preview if not came from image view
+-convert update user profile/cover to use a toast notification instead
+-move clearOverlayURl and generateOverlayUrl to useOverlay hook and return them for destructuring?
+-on modal close event instead of redirecting it to some url. just clean the params for betrter reusability
+-render modal based in url: maybe use params like: user?overlay=userAddSkill
+-fine tune open dialog on close of dialog clear all parameter
+-fine tune showmore/showless user about functionality
+-handle modal close on useEffect instead. when the modal closes trigger the onclose function or something so that modal can be closed anywhere
+-button on the header of modal: pass a function that trigger close modal
+-rename useOverlay to useOverlayFunctions
+-update useOverlay docs
+-rename useOpenOverlay to openOverlay and prevent it from deleting previous parameter just append it.
+-rename other constants to have a .Constants for clarity
+-implement verify close on modal close when input changes
+-rename DialogConfirmationUtil to ExitConfirmationDialog for clarity
+-update the ModalConstants and provider to be like the dialog Provider
+-update the components that uses the ModalNames to open modals, to use the UserModal.Modalname.Name
+-centralizing all useHooks that on overlay modal
+-extract the form to a seperate fiorm component in edit User contact modal
+-add the email on the edit contact modal
+-design modals to be resposive and have dynamic height using clamp
+-implement dark mode toggle and system preferences
+-some bug when the user not loaded fast the image and email about in the header is missing maybe on
+-remove popUpExampleDialog/ some bug occured to its path
+-fix user components rounded on sm:above
+-implement dark mode provider
+-add skills under the skill suggestions on skill add modal
+-fix labeledtexinput on the autocomplete and name label tags
+-fix modal auto height
+-implement contact section
+-remove lazy loading on update profile and cover preview modal to avoid flashing
+-update modal to have style that has a fixed header or style that you provide the header
+-extract boolean from menu in ProfileDropdownmenu and use it as conditinal rendering to use animate prescence
+-fix tab button active on login and register not showing focus rings, and socialAuth button hover states
+-fix register, editSkill dark mode
+-fix login/register mobile view use the labeledTextInput if possible
+-conditional render the remove account on options/settings component
+-clean dependency for unused deps
+-fix dark and light icons
