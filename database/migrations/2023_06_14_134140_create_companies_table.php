@@ -17,12 +17,8 @@ return new class extends Migration {
             $table->string('company_logo')->nullable();
             $table->string('website')->nullable();
             $table->text('description')->nullable();
-            $table->string('industry')->nullable();
-            $table->text('benefits')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->text('mission')->nullable();
-            $table->text('vision')->nullable();
             $table->unsignedBigInteger('company_size_id')->nullable();
             $table->timestamps();
 
