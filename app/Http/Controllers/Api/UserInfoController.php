@@ -2,16 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\UserInfo;
-use Illuminate\Http\Request;
-use App\Helpers\ExceptionHelper;
 use App\Helpers\JwtHelper;
+use App\Helpers\ExceptionHelper;
 use App\Services\UserInfoService;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreUserInfoRequest;
 use App\Http\Requests\UpdateCoverImageRequest;
 use App\Http\Requests\UpdateUserInfoRequest;
 use App\Http\Requests\UpdateProfileImageRequest;

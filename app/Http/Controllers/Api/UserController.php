@@ -70,18 +70,4 @@ class UserController extends Controller {
             return ExceptionHelper::handleException($e);
         }
     }
-
-    public function updateSkill(UpdateUserSkillRequest $request) {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $skills = $request->validated()['skills'];
-            $this->authorize('update', $user);
-            $this->userService->updateSkill($user, $skills);
-            return response()->json([
-                "message" => "Skills updated successfully."
-            ]);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
 }
