@@ -42,6 +42,10 @@ class Job extends Model {
         return $this->belongsToMany(JobType::class, 'job_job_types', 'job_id', 'job_type_id');
     }
 
+    public function workLocationTypes() {
+        return $this->belongsToMany(WorkLocationType::class);
+    }
+
     protected static function boot() {
         parent::boot();
 

@@ -17,19 +17,15 @@ class JobTypeFactory extends Factory {
      */
     public function definition(): array {
         return [
-            'job_type' => $this->faker->randomElement([
+            'job_type' => $this->faker->unique()->randomElement([
                 "Full-Time",
                 "Part-Time",
-                "Remote",
-                "On-Site",
-                "Contract/Freelance",
+                "Contract",
+                "Freelance",
                 "Internship",
                 "Temporary",
-                "Freelance",
                 "Commission-Based",
                 "Seasonal",
-                "Remote Part-Time",
-                "Hybrid",
             ]),
         ];
     }

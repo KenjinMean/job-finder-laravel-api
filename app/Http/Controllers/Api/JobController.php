@@ -54,23 +54,15 @@ class JobController extends Controller {
 
     /* FETCH job details using slug */
     public function show($jobSlug): JsonResponse {
-        try {
-            $job = $this->jobService->showJob($jobSlug);
-            return response()->json(["job" => $job]);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        $job = $this->jobService->showJob($jobSlug);
+        return response()->json(["job" => $job]);
     }
 
     public function update(UpdateJobRequest $request, Job $job) {
-        try {
-            $this->authorize("update", $job);
-            $validatedRequest = $request->validated();
-            $this->jobService->updateJob($validatedRequest, $job);
-            return response()->json(["message" => "Updated job successfully"]);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        $this->authorize("update", $job);
+        $validatedRequest = $request->validated();
+        $this->jobService->updateJob($validatedRequest, $job);
+        return response()->json(["message" => "Updated job successfully"]);
     }
 
     public function destroy(Job $job) {

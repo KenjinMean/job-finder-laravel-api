@@ -22,10 +22,11 @@ return new class extends Migration {
             $table->string('experience_level', 50)->nullable();
             $table->string('category', 50)->nullable();
             $table->timestamp('application_deadline_at')->nullable();
-            $table->timestamps();
 
             $table->unsignedBigInteger('company_id');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 

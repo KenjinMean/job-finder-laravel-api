@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\SkillResource;
-use App\Http\Resources\CompanyLogoResource;
+use App\Http\Resources\WorkLocationTypeResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class JobDetailsResource extends JsonResource {
@@ -31,6 +31,7 @@ class JobDetailsResource extends JsonResource {
       'company' => new CompanyResource($this->whenLoaded('company')),
       'skills' => SkillResource::collection($this->whenLoaded('skills')),
       'job_types' => JobTypeResource::collection($this->whenLoaded('jobTypes')),
+      'work_location_types' => WorkLocationTypeResource::collection($this->whenLoaded(('workLocationTypes'))),
     ];
   }
 }
