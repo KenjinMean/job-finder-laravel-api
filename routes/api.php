@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\UserInfoController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\UserContactController;
+use App\Http\Controllers\Api\UserExperienceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,7 +101,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('users')->group(function () {
         Route::post('/store', [UserController::class, 'store'])->name('user.store');
         Route::get('/show', [UserController::class, 'show'])->name('user.show');
-        Route::delete('users/destroy', [UserController::class, 'destroy'])->middleware(['auth:api'])->name('user.destroy');
     });
 });
 
@@ -108,19 +108,21 @@ Route::middleware(['auth:api'])->group(function () {
 Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::prefix('users')->group(function () {
         Route::patch('/update', [UserController::class, 'update'])->name('user.update');
-        Route::patch('/update-skills', [UserController::class, 'updateSkill'])->name('user.update-skill');
+        Route::delete('users/destroy', [UserController::class, 'destroy'])->middleware(['auth:api'])->name('user.destroy');
     });
 });
 
 //PUBLIC USER INFO ROUTES
 
-
 # PRIVATE USER INFO ROUTES
+
 # UNVERIFIED USER-INFO ROUTES
 Route::middleware(['auth:api'])->group(function () {
     Route::prefix('user-infos')->group(function () {
         Route::get('/show', [UserInfoController::class, 'show'])->name('user-infos.show');
         Route::patch('/update', [UserInfoController::class, 'update'])->name('user-infos.update');
+        Route::patch('/update-profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile');
+        Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
     });
 
     # SKILL ROUTES
@@ -128,20 +130,28 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
     Route::post('add-skill', [SkillController::class, 'addSkill'])->name('skills.update-skill');
     Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
+
+    # USER INFO ROUTES
+    Route::prefix('user-infos')->group(function () {
+        Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
+        Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
+    });
+
+    # USER CONTACT ROUTES
+    Route::prefix('user-contact')->group(function () {
+        Route::get('/show', [UserContactController::class, 'show'])->name('user-contact.show');
+        Route::patch('/update', [UserContactController::class, 'update'])->name('user-contact.update');
+    });
+
+    # USER EXPERIENCE ROUTES
+    Route::prefix('user-experience')->group(function () {
+        Route::get('/show', [UserExperienceController::class, 'show'])->name('user-contact.show');
+        // Route::patch('/update', [UserExperienceController::class, 'update'])->name('user-contact.update');
+    });
 });
 
 # VERIFIED USER-INFO ROUTES
 Route::middleware(['auth:api', 'verified'])->group(function () {
-    Route::prefix('user-infos')->group(function () {
-        Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
-        Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
-        Route::patch('/update-profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile');
-        Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
-    });
 });
 
 // USER CONTACT ROUTES
-Route::prefix('user-contact')->group(function () {
-    Route::get('/show', [UserContactController::class, 'show'])->name('user-contact.show');
-    Route::patch('/update', [UserContactController::class, 'update'])->name('user-contact.update');
-});
