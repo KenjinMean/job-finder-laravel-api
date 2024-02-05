@@ -4,16 +4,12 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\Job;
 use App\Models\User;
-use App\Models\Skill;
 use App\Models\UserInfo;
 use App\Models\UserContact;
 use App\Models\UserEducation;
 use App\Models\UserWorkExperience;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Database\Factories\JobSkillFactory;
 
 class DatabaseSeeder extends Seeder {
     /**
@@ -39,13 +35,16 @@ class DatabaseSeeder extends Seeder {
         $this->call(CompanySizeCategorySeeder::class);
 
         /** Create 20 company */
-        \App\Models\Company::factory(50)->create();
+        \App\Models\Company::factory(5)->create();
 
         /** Create 40 jobs */
-        \App\Models\Job::factory(200)->create();
+        \App\Models\Job::factory(40)->create();
 
         /** Create JobTypes */
-        \App\Models\JobType::factory()->count(16)->create();
+        \App\Models\JobType::factory()->count(8)->create();
+
+        /** Create WorkLocationType */
+        \App\Models\WorkLocationType::factory(3)->create();
 
         /** Call Skills Table Seeder */
         $this->call(SkillsTableSeeder::class);
@@ -55,6 +54,8 @@ class DatabaseSeeder extends Seeder {
         $this->call(UserSkillPivotTableSeeder::class);
 
         $this->call(JobJobTypeSeeder::class);
+
+        $this->call(WorkLocationTypeSeeder::class);
 
         /** Generate UserContact for each user */
         User::all()->each(function ($user) {
@@ -100,7 +101,7 @@ class DatabaseSeeder extends Seeder {
         // create user education
         User::all()->each(function ($user) {
             // Generate a random number of educations (between 1 and 2)
-            $numEducations = rand(1, 2);
+            $numEducations = rand(3, 5);
 
             // Create and associate 1-2 education records for the user
             UserEducation::factory($numEducations)->create([
@@ -111,7 +112,7 @@ class DatabaseSeeder extends Seeder {
         // create user experience
         User::all()->each(function ($user) {
             // Generate a random number of educations (between 1 and 2)
-            $numExperience = rand(1, 2);
+            $numExperience = rand(3, 5);
 
             // Create and associate 1-2 education records for the user
             UserWorkExperience::factory($numExperience)->create([
