@@ -101,7 +101,7 @@ class DatabaseSeeder extends Seeder {
         // create user education
         User::all()->each(function ($user) {
             // Generate a random number of educations (between 1 and 2)
-            $numEducations = rand(3, 5);
+            $numEducations = rand(1, 2);
 
             // Create and associate 1-2 education records for the user
             UserEducation::factory($numEducations)->create([
@@ -111,10 +111,10 @@ class DatabaseSeeder extends Seeder {
 
         // create user experience
         User::all()->each(function ($user) {
-            // Generate a random number of educations (between 1 and 2)
+            // Generate a random number of experience (between 1 and 2)
             $numExperience = rand(3, 5);
 
-            // Create and associate 1-2 education records for the user
+            // Create and associate 1-2 experience records for the user
             UserWorkExperience::factory($numExperience)->create([
                 'user_id' => $user->id,
             ]);

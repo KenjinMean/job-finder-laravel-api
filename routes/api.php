@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\UserInfoController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\UserContactController;
+use App\Http\Controllers\Api\UserEducationController;
 use App\Http\Controllers\Api\UserExperienceController;
 
 /*
@@ -125,27 +126,33 @@ Route::middleware(['auth:api'])->group(function () {
         Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
     });
 
-    # SKILL ROUTES
+    # SKILLS ROUTES
     Route::get('get-user-skills', [SkillController::class, 'getUserSkills'])->name('skills.get-user-skills');
     Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
     Route::post('add-skill', [SkillController::class, 'addSkill'])->name('skills.update-skill');
     Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
 
-    # USER INFO ROUTES
+    # USER INFOS ROUTES
     Route::prefix('user-infos')->group(function () {
         Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
         Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
     });
 
-    # USER CONTACT ROUTES
-    Route::prefix('user-contact')->group(function () {
+    # USER CONTACTS ROUTES
+    Route::prefix('user-contacts')->group(function () {
         Route::get('/show', [UserContactController::class, 'show'])->name('user-contact.show');
         Route::patch('/update', [UserContactController::class, 'update'])->name('user-contact.update');
     });
 
-    # USER EXPERIENCE ROUTES
-    Route::prefix('user-experience')->group(function () {
+    # USER EXPERIENCES ROUTES
+    Route::prefix('user-experiences')->group(function () {
         Route::get('/show', [UserExperienceController::class, 'show'])->name('user-contact.show');
+        // Route::patch('/update', [UserExperienceController::class, 'update'])->name('user-contact.update');
+    });
+
+    # USER EDUCATIONS ROUTES
+    Route::prefix('user-educations')->group(function () {
+        Route::get('/show', [UserEducationController::class, 'show'])->name('user-education.show');
         // Route::patch('/update', [UserExperienceController::class, 'update'])->name('user-contact.update');
     });
 });
