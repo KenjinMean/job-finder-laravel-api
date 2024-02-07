@@ -75,7 +75,7 @@ class JobService {
 
   public function searchJobs($keyword) {
     return JobPreliminaryResource::collection(Job::where('title', 'like', "%$keyword%")
-      ->with('company', 'skills', 'jobTypes')
+      ->with('company', 'skills', 'jobTypes', 'workLocationTypes')
       ->orderBy('created_at', 'desc')
       ->paginate(10));
     //throw a queryException:->orderBy('none_existing_column', 'desc')
