@@ -43,7 +43,7 @@ Route::middleware(['auth:api'])->group(function () {
 Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
     Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
-    Route::get('/auth/{provider}/get-authorization-url', [SocialAuthController::class, 'getProviderAuthorizationUrl'])->name('social.callback');
+    Route::get('/auth/{provider}/get-authorization-url', [SocialAuthController::class, 'getProviderAuthorizationUrl'])->name('social.getAuthUrl');
 });
 
 # Custom Email Verification Route
@@ -146,14 +146,16 @@ Route::middleware(['auth:api'])->group(function () {
 
     # USER EXPERIENCES ROUTES
     Route::prefix('user-experiences')->group(function () {
-        Route::get('/show', [UserExperienceController::class, 'show'])->name('user-contact.show');
+        Route::get('/show', [UserExperienceController::class, 'show'])->name('user-experiences.show');
         // Route::patch('/update', [UserExperienceController::class, 'update'])->name('user-contact.update');
     });
 
-    # USER EDUCATIONS ROUTES
+    # USER EDUCATIONS ROUTES RESTFUL Rotues
     Route::prefix('user-educations')->group(function () {
-        Route::get('/show', [UserEducationController::class, 'show'])->name('user-education.show');
-        // Route::patch('/update', [UserExperienceController::class, 'update'])->name('user-contact.update');
+        Route::get('/', [UserEducationController::class, 'index'])->name('user-educations.index');
+        Route::post('/', [UserEducationController::class, 'store'])->name('user-educations.store');
+        Route::patch('/{user_education_id}', [UserEducationController::class, 'update'])->name('user-educations.update');
+        Route::delete('/{user_education_id}', [UserEducationController::class, 'destroy'])->name('user-educations.destroy');
     });
 });
 

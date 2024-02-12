@@ -21,4 +21,8 @@ class UserEducation extends Model {
         "end_date",
         'graduation_status',
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }
