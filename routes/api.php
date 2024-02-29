@@ -117,13 +117,14 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
 # PRIVATE USER INFO ROUTES
 
-# UNVERIFIED USER-INFO ROUTES
+# UNVERIFIED ROUTES
 Route::middleware(['auth:api'])->group(function () {
+    # USER-INFO ROUTES
     Route::prefix('user-infos')->group(function () {
-        Route::get('/show', [UserInfoController::class, 'show'])->name('user-infos.show');
-        Route::patch('/update', [UserInfoController::class, 'update'])->name('user-infos.update');
-        Route::patch('/update-profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile');
-        Route::patch('/update-cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
+        Route::get('/', [UserInfoController::class, 'show'])->name('user-infos.show');
+        Route::patch('/', [UserInfoController::class, 'update'])->name('user-infos.update');
+        Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile-image');
+        Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
     });
 
     # SKILLS ROUTES
@@ -133,29 +134,41 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
 
     # USER INFOS ROUTES
-    Route::prefix('user-infos')->group(function () {
-        Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
-        Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
-    });
+    // Route::prefix('user-infos')->group(function () {
+    //     Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
+    //     Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
+    // });
 
     # USER CONTACTS ROUTES
-    Route::prefix('user-contacts')->group(function () {
+    Route::prefix('user-contact')->group(function () {
+        Route::get('/', [UserContactController::class, 'show'])->name('user-contact.show');
+        Route::post('/', [UserContactController::class, 'store'])->name('user-contact.store');
+        Route::patch('/', [UserContactController::class, 'update'])->name('user-contact.update');
+
         Route::get('/show', [UserContactController::class, 'show'])->name('user-contact.show');
         Route::patch('/update', [UserContactController::class, 'update'])->name('user-contact.update');
     });
 
-    # USER EXPERIENCES ROUTES
+    # USER EXPERIENCES RESTFUL ROUTES
+    // IMPLEMENT a public route so others can see your experience
     Route::prefix('user-experiences')->group(function () {
-        Route::get('/show', [UserExperienceController::class, 'show'])->name('user-experiences.show');
-        // Route::patch('/update', [UserExperienceController::class, 'update'])->name('user-contact.update');
+        Route::get('/', [UserExperienceController::class, 'index'])->name('user-experiences.index');
+        Route::post('/', [UserExperienceController::class, 'store'])->name('user-experiences.store');
+        Route::get('/{user_experience_id}', [UserExperienceController::class, 'show'])->name('user-experiences.show');
+        Route::patch('/{user_experience_id}', [UserExperienceController::class, 'update'])->name('user-experiences.update');
+        Route::delete('/{user_experience_id}', [UserExperienceController::class, 'destroy'])->name('user-experiences.destroy');
     });
 
     # USER EDUCATIONS ROUTES RESTFUL Rotues
+    // IMPLEMENT a public route so others can see your education
     Route::prefix('user-educations')->group(function () {
         Route::get('/', [UserEducationController::class, 'index'])->name('user-educations.index');
         Route::post('/', [UserEducationController::class, 'store'])->name('user-educations.store');
         Route::patch('/{user_education_id}', [UserEducationController::class, 'update'])->name('user-educations.update');
         Route::delete('/{user_education_id}', [UserEducationController::class, 'destroy'])->name('user-educations.destroy');
+
+        // to implemet
+        Route::get('/{user_education_id}', [UserEducationController::class, 'show'])->name('user-education.show');
     });
 });
 

@@ -14,13 +14,16 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->string('company_name');
             $table->string('job_title');
+            $table->string('position');
+            $table->string('job_type');
+            $table->string('work_location_type');
             $table->date('start_date');
-            $table->date('end_date');
+            $table->date('end_date')->nullable();
             $table->string('location');
-            $table->longText('description');
-            $table->boolean('is_current');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->boolean('is_current')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

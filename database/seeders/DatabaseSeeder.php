@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder {
 
         $this->call(WorkLocationTypeSeeder::class);
 
+
         /** Generate UserContact for each user */
         User::all()->each(function ($user) {
             UserContact::factory()->create(['user_id' => $user->id]);
@@ -119,5 +120,7 @@ class DatabaseSeeder extends Seeder {
                 'user_id' => $user->id,
             ]);
         });
+
+        $this->call(SkillUserWorkExperienceSeeder::class);
     }
 }
