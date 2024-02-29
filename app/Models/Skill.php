@@ -19,4 +19,8 @@ class Skill extends Model {
     public function jobs() {
         return $this->belongsToMany(Job::class, 'job_skill')->withTimestamps();
     }
+
+    public function userWorkExperiences() {
+        return $this->belongsToMany(UserWorkExperience::class);
+    }
 }
