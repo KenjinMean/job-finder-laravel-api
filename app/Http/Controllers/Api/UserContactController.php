@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Helpers\ExceptionHelper;
 use App\Helpers\JwtHelper;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateUserContactRequest;
-use App\Services\UserContactService;
-use App\Services\UserInfoService;
 use Illuminate\Http\Request;
+use App\Helpers\ExceptionHelper;
+use App\Http\Controllers\Controller;
+use App\Services\UserContactService;
+use App\Http\Requests\UpdateUserContactRequest;
+use App\Models\User;
 
 class UserContactController extends Controller {
 
@@ -17,36 +17,20 @@ class UserContactController extends Controller {
     public function __construct(UserContactService $userContactService) {
         $this->userContactService = $userContactService;
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index() {
-        //
+
+    public function store(UpdateUserContactRequest $request) {
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userContactService->createUserContact($user, $validatedRequest);
+        return response()->json(['message' => 'Created successfully']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show() {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $userContact = $this->userContactService->showUserContact($user);
-            return response()->json($userContact);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        $user = JwtHelper::getUserFromToken();
+        $userContact = $this->userContactService->showUserContact($user);
+        return response()->json($userContact);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateUserContactRequest $request) {
         try {
             $user = JwtHelper::getUserFromToken();
@@ -58,10 +42,6 @@ class UserContactController extends Controller {
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id) {
-        //
     }
 }

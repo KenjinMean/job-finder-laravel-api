@@ -19,7 +19,7 @@ class UpdateUserContactRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'phone' => ['nullable', 'regex:/^\+63-\d{3}-\d{3}-\d{4}$/'],
+            'phone' => ['nullable', 'regex:/^\+\d{1,3}-\d{1,4}-\d{1,4}-\d{4}$/'],
             'city' => "string|nullable",
             'province' => "string|nullable",
             'country' => "string|nullable",
