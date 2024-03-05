@@ -60,6 +60,6 @@ class UserExperienceController extends Controller {
         $this->authorize('delete', [UserWorkExperience::class, $experienceId]);
 
         $this->userExperienceService->destroy($experienceId);
-        return response()->json(['message' => 'User experience record deleted successfully'], 200);
+        return response()->json(['message' => 'User experience record deleted successfully'], Response::HTTP_OK);
     }
 }

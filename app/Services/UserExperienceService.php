@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Models\UserWorkExperience;
 use App\Http\Resources\UserExperienceResource;
-use App\Models\Skill;
-use App\Models\SkillUser;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class UserExperienceService {
@@ -52,6 +50,9 @@ class UserExperienceService {
     // Update the user work experience data
     $userExperience->update($data);
 
+    // Sync the skills for the user work experience
+    $userExperience->skills()->sync($skillIds);
+
     // Attach new skills to the user work experience
     foreach ($skillIds as $skillId) {
       $userExperience->skills()->syncWithoutDetaching($skillId);
@@ -64,17 +65,6 @@ class UserExperienceService {
 
     return response()->json(["message" => "User experience updated successfully"]);
   }
-  // public function update($data, $user) {
-  //   $experienceId = $data['id'];
-  //   $skillIds = $data['skillIds'] ?? [];
-
-  //   $userExperience = UserWorkExperience::findOrFail($experienceId);
-
-  //   $userExperience->update($data);
-  //   $userExperience->skills()->sync($skillIds);
-
-  //   return response()->json(["message" => "User experience updated successfully"]);
-  // }
 
   /* ----------------------------------------------------------- */
   public function destroy($userExperienceId) {
