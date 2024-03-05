@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\UserInfoResource;
 
 class UserInfoService {
-  public function showUserInfo($user) {
+  public function index($user) {
     $userInfo = $user->userInfo;
 
     if (!$userInfo) {
@@ -17,17 +17,12 @@ class UserInfoService {
     return new UserInfoResource($userInfo);
   }
 
+  public function store() {
+  }
+
   public function updateUserInfo($user, $validatedRequest) {
     $userInfo = $user->userInfo;
-
-    $userInfo->update([
-      'first_name' => $validatedRequest['first_name'] ?? "",
-      'last_name' => $validatedRequest['last_name'] ?? "",
-      'headline' => $validatedRequest['headline'] ?? "",
-      'additional_name' => $validatedRequest['additional_name'] ?? "",
-      'pronouns' => $validatedRequest['pronouns'] ?? "",
-      'about' => $validatedRequest['about'] ?? "",
-    ]);
+    $userInfo->fill($validatedRequest)->save();
   }
 
   # NOTE can refactor this update profile image to update cover image

@@ -17,6 +17,7 @@ class UserService {
 
   public function getUser($user) {
     $user->load('skills');
+    // $user->load('skills', 'userInfo');
     // return new UserResource(Auth::user());
     // return new UserResource($user);
     return new UserProfileResource($user->load('skills', 'userInfo'));
