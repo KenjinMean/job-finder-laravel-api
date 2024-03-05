@@ -13,6 +13,7 @@ class UserContactResource extends JsonResource {
      */
     public function toArray($request) {
         return [
+            'id' => $this->id,
             'phone' => $this->phone,
             'city' => $this->city,
             'province' => $this->province,

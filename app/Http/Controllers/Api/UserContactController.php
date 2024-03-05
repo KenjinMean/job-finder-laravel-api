@@ -18,6 +18,12 @@ class UserContactController extends Controller {
         $this->userContactService = $userContactService;
     }
 
+    public function index() {
+        $user = JwtHelper::getUserFromToken();
+        $userContact = $this->userContactService->showUserContact($user);
+        return response()->json($userContact);
+    }
+
     public function store(UpdateUserContactRequest $request) {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
@@ -25,23 +31,10 @@ class UserContactController extends Controller {
         return response()->json(['message' => 'Created successfully']);
     }
 
-    public function show() {
-        $user = JwtHelper::getUserFromToken();
-        $userContact = $this->userContactService->showUserContact($user);
-        return response()->json($userContact);
-    }
-
     public function update(UpdateUserContactRequest $request) {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $validatedRequest = $request->validated();
-            $this->userContactService->updateUserContact($user, $validatedRequest);
-            return response()->json(['message' => 'Updated successfully']);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    public function destroy(string $id) {
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userContactService->updateUserContact($user, $validatedRequest);
+        return response()->json(['message' => 'Updated successfully']);
     }
 }
