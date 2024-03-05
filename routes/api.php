@@ -9,10 +9,10 @@ use App\Http\Middleware\CheckTokenExpiration;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\UserInfoController;
 use App\Http\Controllers\Api\SocialAuthController;
-use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\UserContactController;
 use App\Http\Controllers\Api\UserEducationController;
 use App\Http\Controllers\Api\UserExperienceController;
+use App\Http\Controllers\Api\EmailVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +92,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('company.destroy');
     Route::patch('companies/update-company-image/{company}', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
 });
+
 Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('company.show');
 });
@@ -113,67 +114,36 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     });
 });
 
-//PUBLIC USER INFO ROUTES
 
-# PRIVATE USER INFO ROUTES
-
-# UNVERIFIED ROUTES
+# UNVERIFIED ROUTES FOR testing
 Route::middleware(['auth:api'])->group(function () {
     # USER-INFO ROUTES
-    Route::prefix('user-infos')->group(function () {
-        Route::get('/', [UserInfoController::class, 'show'])->name('user-infos.show');
-        Route::patch('/', [UserInfoController::class, 'update'])->name('user-infos.update');
-        Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-infos.update-profile-image');
-        Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-infos.update-cover');
+    Route::prefix('user-info')->group(function () {
+        Route::get('/', [UserInfoController::class, 'index'])->name('user-info.index');
+        Route::patch('/', [UserInfoController::class, 'update'])->name('user-info.update');
+        Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-info.update-cover');
+        Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-info.update-profile-image');
     });
 
     # SKILLS ROUTES
+    Route::prefix('skills')->group(function () {
+    });
+
     Route::get('get-user-skills', [SkillController::class, 'getUserSkills'])->name('skills.get-user-skills');
     Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
     Route::post('add-skill', [SkillController::class, 'addSkill'])->name('skills.update-skill');
     Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
 
-    # USER INFOS ROUTES
-    // Route::prefix('user-infos')->group(function () {
-    //     Route::post('/store', [UserInfoController::class, 'store'])->name('user-infos.store');
-    //     Route::delete('/delete', [UserInfoController::class, 'destroy'])->name('user-infos.destroy');
-    // });
-
     # USER CONTACTS ROUTES
     Route::prefix('user-contact')->group(function () {
-        Route::get('/', [UserContactController::class, 'show'])->name('user-contact.show');
+        Route::get('/', [UserContactController::class, 'index'])->name('user-contact.index');
         Route::post('/', [UserContactController::class, 'store'])->name('user-contact.store');
         Route::patch('/', [UserContactController::class, 'update'])->name('user-contact.update');
-
-        Route::get('/show', [UserContactController::class, 'show'])->name('user-contact.show');
-        Route::patch('/update', [UserContactController::class, 'update'])->name('user-contact.update');
     });
 
     # USER EXPERIENCES RESTFUL ROUTES
-    // IMPLEMENT a public route so others can see your experience
-    Route::prefix('user-experiences')->group(function () {
-        Route::get('/', [UserExperienceController::class, 'index'])->name('user-experiences.index');
-        Route::post('/', [UserExperienceController::class, 'store'])->name('user-experiences.store');
-        Route::get('/{user_experience_id}', [UserExperienceController::class, 'show'])->name('user-experiences.show');
-        Route::patch('/{user_experience_id}', [UserExperienceController::class, 'update'])->name('user-experiences.update');
-        Route::delete('/{user_experience_id}', [UserExperienceController::class, 'destroy'])->name('user-experiences.destroy');
-    });
+    Route::apiResource('user-experiences', UserExperienceController::class);
 
     # USER EDUCATIONS ROUTES RESTFUL Rotues
-    // IMPLEMENT a public route so others can see your education
-    Route::prefix('user-educations')->group(function () {
-        Route::get('/', [UserEducationController::class, 'index'])->name('user-educations.index');
-        Route::post('/', [UserEducationController::class, 'store'])->name('user-educations.store');
-        Route::patch('/{user_education_id}', [UserEducationController::class, 'update'])->name('user-educations.update');
-        Route::delete('/{user_education_id}', [UserEducationController::class, 'destroy'])->name('user-educations.destroy');
-
-        // to implemet
-        Route::get('/{user_education_id}', [UserEducationController::class, 'show'])->name('user-education.show');
-    });
+    Route::apiResource('user-educations', UserEducationController::class);
 });
-
-# VERIFIED USER-INFO ROUTES
-Route::middleware(['auth:api', 'verified'])->group(function () {
-});
-
-// USER CONTACT ROUTES
