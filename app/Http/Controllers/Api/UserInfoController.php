@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\JwtHelper;
-use App\Helpers\ExceptionHelper;
 use App\Services\UserInfoService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateCoverImageRequest;
 use App\Http\Requests\UpdateUserInfoRequest;
+use App\Http\Requests\UpdateCoverImageRequest;
 use App\Http\Requests\UpdateProfileImageRequest;
+use Illuminate\Http\Response;
 
 class UserInfoController extends Controller {
 
@@ -18,46 +18,30 @@ class UserInfoController extends Controller {
         $this->userInfoService = $userInfoService;
     }
 
-    public function show() {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $userInfo = $this->userInfoService->showUserInfo($user);
-            return response()->json($userInfo);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+    public function index() {
+        $user = JwtHelper::getUserFromToken();
+        $userInfo = $this->userInfoService->index($user);
+        return response()->json($userInfo);
     }
 
     public function update(UpdateUserInfoRequest $request) {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $validatedRequest = $request->validated();
-            $this->userInfoService->updateUserInfo($user, $validatedRequest);
-            return response()->json(['message' => 'Updated successfully']);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userInfoService->updateUserInfo($user, $validatedRequest);
+        return response()->json(['message' => 'Updated successfully'], Response::HTTP_OK);
     }
 
     public function updateProfileImage(UpdateProfileImageRequest $request) {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $validatedRequest = $request->validated();
-            $this->userInfoService->updateProfileImage($user, $validatedRequest);
-            return response()->json(['message' => 'Profile photo updated successfully']);
-        } catch (\Throwable $e) {
-            return response()->json(["message" => $e->getMessage()]);
-        }
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userInfoService->updateProfileImage($user, $validatedRequest);
+        return response()->json(['message' => 'Profile photo updated successfully'], Response::HTTP_OK);
     }
 
     public function updateCoverImage(UpdateCoverImageRequest $request) {
-        try {
-            $user = JwtHelper::getUserFromToken();
-            $validatedRequest = $request->validated();
-            $this->userInfoService->updateCoverImage($user, $validatedRequest);
-            return response()->json(['message' => 'Cover photo updated successfully']);
-        } catch (\Throwable $e) {
-            return response()->json(["message" => $e->getMessage()]);
-        }
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userInfoService->updateCoverImage($user, $validatedRequest);
+        return response()->json(['message' => 'Cover photo updated successfully'], Response::HTTP_OK);
     }
 }
