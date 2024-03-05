@@ -2,15 +2,21 @@
 
 namespace App\Services;
 
-use App\Http\Resources\UserEducationResource;
 use App\Models\UserEducation;
+use App\Http\Resources\UserEducationResource;
 
 class UserEducationService {
 
   /* ----------------------------------------------------------- */
-  public function index($user) {
+  public function getUserEducations($user) {
     $userEducation = $user->userEducations;
     return UserEducationResource::collection($userEducation);
+  }
+
+  /* ----------------------------------------------------------- */
+  public function getUserEducation($user, $educationId) {
+    $userEducation = UserEducation::where('user_id', $user->id)->find($educationId);
+    return new UserEducationResource($userEducation);
   }
 
   /* ----------------------------------------------------------- */
@@ -22,14 +28,12 @@ class UserEducationService {
   /* ----------------------------------------------------------- */
   public function updateUserEducation($data, $id) {
     $userEducation = UserEducation::findOrFail($id);
-
-    // return response()->json(["user-education" => $userEducation]);
     $userEducation->update($data);
   }
 
   /* ----------------------------------------------------------- */
-  public function destroyUserEducation($userEducationId) {
-    $userEducation = UserEducation::findOrFail($userEducationId);
+  public function destroyUserEducation($educationId) {
+    $userEducation = UserEducation::findOrFail($educationId);
     $userEducation->delete();
   }
 }

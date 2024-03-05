@@ -20,11 +20,10 @@ class StoreUserEducationRequest extends FormRequest {
     public function rules(): array {
         return [
             'institution_name' => 'required|string',
-            'degree' => 'required|string',
-            'major' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'graduation_status' => 'required|string',
+            'degree' => 'nullable|string',
+            'major' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after:start_date',
         ];
     }
 }

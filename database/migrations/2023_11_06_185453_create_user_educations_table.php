@@ -13,11 +13,10 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('institution_name');
-            $table->string('degree');
-            $table->string('major');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->string('graduation_status');
+            $table->string('degree')->nullable();
+            $table->string('major')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

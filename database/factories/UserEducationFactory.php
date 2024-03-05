@@ -108,20 +108,12 @@ class UserEducationFactory extends Factory {
             'Other (Specify)'
         ];
 
-        $graduationStatusOptions = [
-            'Expected Graduation',
-            'Graduated',
-            'On Leave',
-            'Suspended',
-        ];
-
         return [
             'institution_name' => $this->faker->company(),
             'degree' => $this->faker->randomElement($academicDegrees),
             'major' => $this->faker->randomElement($majorFields),
             'start_date' => $this->faker->date(),
             'end_date' => $this->faker->date(),
-            'graduation_status' => $this->faker->randomElement($graduationStatusOptions),
             'user_id' => User::all()->random()->id,
         ];
     }

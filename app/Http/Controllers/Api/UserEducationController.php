@@ -20,7 +20,14 @@ class UserEducationController extends Controller {
     /* ----------------------------------------------------------- */
     public function index() {
         $user = JwtHelper::getUserFromToken();
-        $userEducation = $this->userEducationService->index($user);
+        $userEducation = $this->userEducationService->getUserEducations($user);
+        return response()->json($userEducation);
+    }
+
+    /* ----------------------------------------------------------- */
+    public function show($educationId) {
+        $user = JwtHelper::getUserFromToken();
+        $userEducation = $this->userEducationService->getUserEducation($user, $educationId);
         return response()->json($userEducation);
     }
 
@@ -34,19 +41,17 @@ class UserEducationController extends Controller {
     }
 
     /* ----------------------------------------------------------- */
-    public function update(StoreUserEducationRequest $request, $id) {
+    public function update(StoreUserEducationRequest $request, $educationId) {
         $user = JwtHelper::getUserFromToken();
         $validatedData = $request->validated();
 
-        $response = $this->userEducationService->updateUserEducation($validatedData, $id,  $user);
-        return response()->json($response, Response::HTTP_OK);
-
-        // return response()->json(["id" => $request->all()]);
+        $this->userEducationService->updateUserEducation($validatedData, $educationId,  $user);
+        return response()->json(["message" => 'User education record updated successfully'], Response::HTTP_OK);
     }
 
     /* ----------------------------------------------------------- */
-    public function destroy($user_education_id) {
-        $this->userEducationService->destroyUserEducation($user_education_id);
-        return response()->json(['message' => 'User education record deleted successfully'], 200);
+    public function destroy($educationId) {
+        $this->userEducationService->destroyUserEducation($educationId);
+        return response()->json(['message' => 'User education record deleted successfully'], Response::HTTP_OK);
     }
 }
