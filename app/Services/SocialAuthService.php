@@ -61,7 +61,8 @@ class SocialAuthService {
             ]);
 
             UserInfo::create([
-                'firstName' => $socialiteUser->getName(),
+                'first_name' => $socialiteUser->getName(),
+                'last_name' => "",
                 'user_id' => $user->id,
                 'profile_image' => $profileImage ?: $defaultProfileImagePath,
                 'cover_image' => $defaultCoverImagePath,
