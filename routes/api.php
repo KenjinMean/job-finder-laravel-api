@@ -61,11 +61,8 @@ Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     });
 });
 
-# SKILL ROUTES
-Route::get('skills', [SkillController::class, 'index']);
-Route::apiResource('skills', SkillController::class);
-
 # JOB ROUTES
+// convert to RESTful api
 Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     Route::get('/jobs/get-job-posting', [JobController::class, 'getJobPostings'])->name('job.get-job-posting');
     Route::get('/jobs/search-jobs', [JobController::class, 'searchJobs'])->name('job.search');
@@ -84,6 +81,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 });
 
 # COMPANY ROUTES
+// convert to RESTful api
 Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('companies/user-companies', [CompanyController::class, 'showUserCompanies'])->name('companies.user-companies');
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
@@ -97,26 +95,36 @@ Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('company.show');
 });
 
+# SKILL ROUTES
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('skills/search-skills', [SkillController::class, 'searchSkill'])->name('skills.search');
+    Route::prefix('skills')->group(function () {
+        Route::get('/', [SkillController::class, 'index'])->name('skill.index');
+        Route::post('/', [SkillController::class, 'store'])->name('skill.store');
+        Route::get('/{skill}', [SkillController::class, 'show'])->name('skill.show');
+        Route::patch('/{skill}', [SkillController::class, 'update'])->name('skill.update');
+        Route::delete('/{skill}', [SkillController::class, 'destroy'])->name('skill.delete');
+    });
+});
+
 # USER ROUTES
-# UNVERIFIED PROTRECTED USER ROUTES
 Route::middleware(['auth:api'])->group(function () {
+    # USER ROUTES
     Route::prefix('users')->group(function () {
-        Route::post('/store', [UserController::class, 'store'])->name('user.store');
-        Route::get('/show', [UserController::class, 'show'])->name('user.show');
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::post('/', [UserController::class, 'store'])->name('users.store');
+        Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::patch('/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['verified'])->name('users.destroy');
+
+        // User Skill Manager Routes
+        Route::get('/{user}/skills', [UserController::class, 'getUserSkills'])->name('users.skills');
+        Route::post('/{user}/skills/{skill}', [UserController::class, 'addUserSkill'])->name('users.add-skill');
+        Route::post('/{user}/skills', [UserController::class, 'addUserSkills'])->name('users.add-skills');
+        Route::delete('/{user}/skills/{skill}', [UserController::class, 'removeUserSkill'])->name('users.remove-skill');
+        Route::delete('/{user}/skills', [UserController::class, 'removeUserSkills'])->name('users.remove-skills');
     });
-});
 
-# VERIFIED PROTRECTED USER ROUTES
-Route::middleware(['auth:api', 'verified'])->group(function () {
-    Route::prefix('users')->group(function () {
-        Route::patch('/update', [UserController::class, 'update'])->name('user.update');
-        Route::delete('users/destroy', [UserController::class, 'destroy'])->middleware(['auth:api'])->name('user.destroy');
-    });
-});
-
-
-# UNVERIFIED ROUTES FOR testing
-Route::middleware(['auth:api'])->group(function () {
     # USER-INFO ROUTES
     Route::prefix('user-info')->group(function () {
         Route::get('/', [UserInfoController::class, 'index'])->name('user-info.index');
@@ -125,25 +133,17 @@ Route::middleware(['auth:api'])->group(function () {
         Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-info.update-profile-image');
     });
 
-    # SKILLS ROUTES
-    Route::prefix('skills')->group(function () {
-    });
-
-    Route::get('get-user-skills', [SkillController::class, 'getUserSkills'])->name('skills.get-user-skills');
-    Route::get('search-skills', [SkillController::class, 'searchSkill'])->name('skills.search-skill');
-    Route::post('add-skill', [SkillController::class, 'addSkill'])->name('skills.update-skill');
-    Route::delete('remove-skill', [SkillController::class, 'removeSkill'])->name('skills.remove-skill');
-
     # USER CONTACTS ROUTES
     Route::prefix('user-contact')->group(function () {
         Route::get('/', [UserContactController::class, 'index'])->name('user-contact.index');
         Route::post('/', [UserContactController::class, 'store'])->name('user-contact.store');
         Route::patch('/', [UserContactController::class, 'update'])->name('user-contact.update');
+        Route::delete('/', [UserContactController::class, 'destroy'])->name('user-contact.delete');
     });
 
-    # USER EXPERIENCES RESTFUL ROUTES
+    # USER EXPERIENCES ROUTES
     Route::apiResource('user-experiences', UserExperienceController::class);
 
-    # USER EDUCATIONS ROUTES RESTFUL Rotues
+    # USER EDUCATIONS ROUTES Rotues
     Route::apiResource('user-educations', UserEducationController::class);
 });
