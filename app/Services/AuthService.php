@@ -52,12 +52,12 @@ class AuthService {
     //     return JwtHelper::generateAccessToken($user);
     // }
 
-    public function registerUser($validatedRequest) {
+    public function registerUser($request) {
 
         $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
         $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
 
-        $existingUser = User::where('email', $validatedRequest['email'])->first();
+        $existingUser = User::where('email', $request['email'])->first();
 
         if ($existingUser) {
             if (!empty($existingUser->github_id)) {
@@ -70,14 +70,18 @@ class AuthService {
         }
 
         $user = User::create([
-            'email' => $validatedRequest['email'],
-            'password' => $validatedRequest['password'],
+            'email' => $request['email'],
+            'password' => $request['password'],
         ]);
 
         UserInfo::create([
             'user_id' => $user->id,
-            'profile_image' => $defaultProfileImagePath,
-            'cover_image' => $defaultCoverImagePath,
+            'first_name' => $request['first_name'],
+            'last_name' => $request['last_name'],
+            // 'profile_image' => $defaultProfileImagePath,
+            // 'cover_image' => $defaultCoverImagePath,
+            'profile_image' => "",
+            'cover_image' => "",
         ]);
 
         return JwtHelper::generateAccessToken($user);
@@ -107,9 +111,9 @@ class AuthService {
         $user = User::where('email', $email)->first();
 
         if ($user) {
-            return response()->json(['message' => 'Email already exists'], 409);
+            return response()->json(["message" => "email exists"], 200);
         } else {
-            return response()->json(['message' => 'Email is available'], 200);
+            return response()->json(null, 200);
         }
     }
 

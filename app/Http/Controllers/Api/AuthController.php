@@ -33,8 +33,7 @@ class AuthController extends Controller {
 
     public function registerUser(RegisterUserRequest $request) {
         try {
-            $validatedRequest = $request->validated();
-            return $this->authService->registerUser($validatedRequest);
+            return $this->authService->registerUser($request);
         } catch (\Exception $e) {
             return ResponseHelper::errorResponse('Registration failed', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
@@ -60,17 +59,13 @@ class AuthController extends Controller {
     }
 
     public function checkEmail(Request $request) {
-        try {
-            $request->validate([
-                'email' => 'required|email',
-            ]);
+        $request->validate([
+            'email' => 'required|email',
+        ]);
 
-            $email = $request->input('email');
+        $email = $request->input('email');
 
-            return $this->authService->checkEmailAvailability($email);
-        } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        return $this->authService->checkEmailAvailability($email);
     }
 
     public function refreshToken(Request $request) {
