@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Services\UserContactService;
 use App\Http\Requests\UpdateUserContactRequest;
 use App\Models\User;
+use App\Models\UserContact;
 
 class UserContactController extends Controller {
 
@@ -28,13 +29,19 @@ class UserContactController extends Controller {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
         $this->userContactService->createUserContact($user, $validatedRequest);
-        return response()->json(['message' => 'Created successfully']);
+        return response()->json(['message' => 'User Contact Created Successfully']);
     }
 
     public function update(UpdateUserContactRequest $request) {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
-        $this->userContactService->updateUserContact($user, $validatedRequest);
-        return response()->json(['message' => 'Updated successfully']);
+        $response = $this->userContactService->updateUserContact($user, $validatedRequest);
+        return $response;
+    }
+
+    public function destroy() {
+        $user = JwtHelper::getUserFromToken();
+        $response = $this->userContactService->deleteUserContact($user);
+        return $response;
     }
 }
