@@ -14,11 +14,7 @@ class UserResource extends JsonResource {
         return [
             'id' => $this->id,
             'email' => $this->email,
-            'user_info' => [
-                'profile_image' => $this->userInfo->profile_image,
-                'first_name' => $this->userInfo->firstName,
-                'last_name' => $this->userInfo->lastName,
-            ],
+            'is_email_verified' => $this->email_verified_at !== null,
         ];
     }
 }
