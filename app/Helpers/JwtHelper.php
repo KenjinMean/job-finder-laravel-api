@@ -3,12 +3,19 @@
 
 namespace App\Helpers;
 
-use App\Http\Resources\LoginResource;
 use App\Models\User;
+use App\Http\Resources\UserResource;
 use App\Services\RefreshTokenGenerator;
+use App\Http\Resources\UserInfoResource;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class JwtHelper {
+  const DEFAULT_TTL_MINUTES = 60;
+  // param minutes
+  public static function getAccessTokenExpiration($minutes = self::DEFAULT_TTL_MINUTES) {
+    return JWTAuth::factory()->getTTL() * $minutes;
+  }
+
   public static function getUserFromToken() {
     try {
       $token = JWTAuth::getToken();
@@ -19,41 +26,35 @@ class JwtHelper {
   }
 
   public static function generateAccessToken($user) {
-    $token = JWTAuth::fromUser($user);
-    $user->load('userInfo');
-    $userResource = new LoginResource($user);
-    $expiresInMinutes = JWTAuth::factory()->getTTL() * 60;
-
     return response()->json([
-      'user' => $userResource,
-      'access_token' => $token,
+      'user' => new UserResource($user),
+      'user_info' =>  new UserInfoResource($user->userInfo),
+      'access_token' => JWTAuth::fromUser($user),
       'token_type' => 'bearer',
-      'expires_in' => $expiresInMinutes,
+      'expires_in' => self::getAccessTokenExpiration(),
     ]);
   }
 
   public static function refreshAccessToken() {
-    $token = JWTAuth::parseToken()->refresh();
-    $expiresInMinutes = JWTAuth::factory()->getTTL() * 60;
-
     return response()->json([
-      'access_token' => $token,
-      'expires_in' => $expiresInMinutes,
+      'access_token' => JWTAuth::parseToken()->refresh(),
+      'expires_in' =>  self::getAccessTokenExpiration(),
     ]);
   }
 
+  // implement this if already have access to "https" site
   public static function generateAccessTokenAndSetRefreshCookie(User $user) {
     $token = JWTAuth::fromUser($user);
     $refreshToken = RefreshTokenGenerator::generateRefreshToken($user);
     $user->load('userInfo');
-    $userResource = new LoginResource($user);
     $expiresInMinutes = 30 * 24 * 60; // 30 days
 
     return response()->json([
-      'user' => $userResource,
+      'user' => new UserResource($user),
+      'user_info' =>  new UserInfoResource($user->userInfo),
       'access_token' => $token,
       'token_type' => 'bearer',
-      'expires_in' => JWTAuth::factory()->getTTL() * 60,
+      'expires_in' => self::getAccessTokenExpiration(),
     ])
       ->withCookie(cookie('refresh_token', $refreshToken, $expiresInMinutes));
   }
