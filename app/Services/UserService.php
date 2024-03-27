@@ -3,10 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Helpers\JwtHelper;
-use App\Http\Resources\UserProfileResource;
 use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class UserService {
@@ -16,11 +13,7 @@ class UserService {
   }
 
   public function getUser($user) {
-    $user->load('skills');
-    // $user->load('skills', 'userInfo');
-    // return new UserResource(Auth::user());
-    // return new UserResource($user);
-    return new UserProfileResource($user->load('skills', 'userInfo'));
+    return new UserResource($user);
   }
 
   public function updateUser($user, $validatedRequest) {
