@@ -7,9 +7,10 @@ use App\Models\UserInfo;
 use App\Helpers\JwtHelper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
-use App\Helpers\ResponseHelper;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\AccountConflictException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthService {
 
@@ -19,54 +20,35 @@ class AuthService {
         return $refreshToken;
     }
 
-    // public function register($validatedRequest) {
-    //     $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
-    //     $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
+    // |--------------------------------------------------------------------------
+    public function login($request) {
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $request['email'])->first();
 
-    //     $existingUser = User::where('email', $validatedRequest['email'])->first();
-    //     if ($existingUser) {
-    //         if (!empty($existingUser->github_id)) {
-    //             return response()->json(['message' => 'This email is already associated with a GitHub account. Would you like to log in with GitHub instead?', "error" => "Account Conflict: Email Already Linked", "provider" => "github"], Response::HTTP_CONFLICT);
-    //         }
-    //         if (!empty($existingUser->google_id)) {
-    //             return response()->json(['message' => 'This email is already associated with a Google account. Would you like to log in with Google instead?', "error" => "Account Conflict: Email Already Linked", "provider" => "google"], Response::HTTP_CONFLICT);
-    //         }
-    //         return ResponseHelper::errorResponse('This email already exists. Please log in using your email and password.', Response::HTTP_CONFLICT, "Account Conflict: Email Already taken");
-    //     }
+        if ($user) {
+            if (!empty($user->github_id) || !empty($user->google_id)) {
+                throw new UnauthorizedHttpException("", 'Your account is linked with another authentication method. Please use that method to log in.', null, Response::HTTP_UNAUTHORIZED);
+            }
+        }
+        if (!Auth::attempt($credentials)) {
+            throw new UnauthorizedHttpException("", 'Invalid email or password. Please check your credentials and try again.', null, Response::HTTP_UNAUTHORIZED);
+        }
 
-    //     $user = User::create([
-    //         'email' => $validatedRequest['email'],
-    //         'password' => $validatedRequest['password'],
-    //     ]);
+        return JwtHelper::generateAccessToken($user);
+    }
 
-    //     // Uncomment to enable sending Verification Email on registration
-    //     // $user->sendEmailVerificationNotification();
-
-    //     UserInfo::create([
-    //         'firstName' => $validatedRequest['name'],
-    //         'user_id' => $user->id,
-    //         'profile_image' => $defaultProfileImagePath,
-    //         'cover_image' => $defaultCoverImagePath,
-    //     ]);
-
-    //     return JwtHelper::generateAccessToken($user);
-    // }
-
-    public function registerUser($request) {
-
-        $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
-        $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
-
+    // |--------------------------------------------------------------------------
+    public function register($request) {
         $existingUser = User::where('email', $request['email'])->first();
 
         if ($existingUser) {
             if (!empty($existingUser->github_id)) {
-                return response()->json(['message' => 'This email is already associated with a GitHub account. log in with using GitHub instead.', "error" => "Account Conflict: Email Already Linked", "provider" => "github"], Response::HTTP_CONFLICT);
+                throw new AccountConflictException('This email is already associated with a GitHub account. Log in with using GitHub instead.', 'github');
             }
             if (!empty($existingUser->google_id)) {
-                return response()->json(['message' => 'This email is already associated with a Google account. log in with using Google instead.', "error" => "Account Conflict: Email Already Linked", "provider" => "google"], Response::HTTP_CONFLICT);
+                throw new AccountConflictException('This email is already associated with a Google account. log in with using Google instead.', "google");
             }
-            return ResponseHelper::errorResponse('This email already exists. Please log in using your email and password.', Response::HTTP_CONFLICT, "Account Conflict: Email Already taken");
+            throw new AccountConflictException('This email already exists. Please log in using your email and password.', "");
         }
 
         $user = User::create([
@@ -78,28 +60,12 @@ class AuthService {
             'user_id' => $user->id,
             'first_name' => $request['first_name'],
             'last_name' => $request['last_name'],
-            // 'profile_image' => $defaultProfileImagePath,
-            // 'cover_image' => $defaultCoverImagePath,
-            'profile_image' => "",
-            'cover_image' => "",
         ]);
 
         return JwtHelper::generateAccessToken($user);
     }
 
-    public function login($validatedCredentials) {
-        $user = User::where('email', $validatedCredentials['email'])->first();
-        if ($user) {
-            if (!empty($user->github_id) || !empty($user->google_id)) {
-                return ResponseHelper::errorResponse('Incorrect Email or Password', Response::HTTP_UNPROCESSABLE_ENTITY, "Authentication Failed: Incorrect Email or Password");
-            }
-        }
-        if (!Auth::attempt($validatedCredentials)) {
-            return ResponseHelper::errorResponse('Incorrect Email or Password', Response::HTTP_UNPROCESSABLE_ENTITY, "Authentication Failed: Incorrect Email or Password");
-        }
-        return JwtHelper::generateAccessToken($user);
-    }
-
+    // |--------------------------------------------------------------------------
     public function logout($user) {
         $user->refresh_token = null;
         $user->save();
@@ -107,19 +73,21 @@ class AuthService {
         JWTAuth::invalidate($token);
     }
 
+    // |--------------------------------------------------------------------------
     public function checkEmailAvailability($email) {
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', $email)->exists();
 
-        if ($user) {
-            return response()->json(["message" => "email exists"], 200);
-        } else {
-            return response()->json(null, 200);
-        }
+        return $user;
     }
 
+    // |--------------------------------------------------------------------------
     public function refreshToken() {
         return JwtHelper::refreshAccessToken();
     }
+
+    // public function refreshToken() {
+    //     return JwtHelper::refreshAccessToken();
+    // }
 
     #CAN IMPLEMENT THIS using HTTPS
     // public function refreshToken($request) {

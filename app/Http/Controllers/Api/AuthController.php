@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\Response;
 use App\Helpers\ResponseHelper;
-use App\Helpers\ExceptionHelper;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\EmailRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisterUserRequest;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use App\Http\Requests\RegisterRequest;
+use App\Exceptions\AccountConflictException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller {
@@ -22,57 +22,63 @@ class AuthController extends Controller {
         $this->authService = $authService;
     }
 
-    // public function register(RegisterUserRequest $request) {
-    //     try {
-    //         $validatedRequest = $request->validated();
-    //         return $this->authService->register($validatedRequest);
-    //     } catch (\Exception $e) {
-    //         return ResponseHelper::errorResponse('Registration failed', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
-    //     }
-    // }
-
-    public function registerUser(RegisterUserRequest $request) {
-        try {
-            return $this->authService->registerUser($request);
-        } catch (\Exception $e) {
-            return ResponseHelper::errorResponse('Registration failed', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
-        }
-    }
-
+    // |--------------------------------------------------------------------------
     public function login(LoginRequest $request) {
         try {
-            $validatedCredentials = $request->validated();
-            return $this->authService->login($validatedCredentials);
+            $AuthenticatedUserData = $this->authService->login($request);
+
+            return response()->json($AuthenticatedUserData, Response::HTTP_OK);
+        } catch (UnauthorizedHttpException $e) {
+            return ResponseHelper::generateErrorResponse($e, $e->getCode());
         } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
+            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    // |--------------------------------------------------------------------------
+    public function register(RegisterRequest $request) {
+        try {
+            $AuthenticatedUserData = $this->authService->register($request);
+
+            return response()->json($AuthenticatedUserData, Response::HTTP_CREATED);
+        } catch (AccountConflictException $e) {
+            return ResponseHelper::generateErrorResponse($e, $e->getCode(), ["provider" => $e->getProvider()]);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // |--------------------------------------------------------------------------
     public function logout() {
         try {
             $user = JwtHelper::getUserFromToken();
             $this->authService->logout($user);
+
             return response(['message' => 'User logged out successfully.'], Response::HTTP_OK);
         } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
+            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function checkEmail(Request $request) {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+    // |--------------------------------------------------------------------------
+    public function checkEmail(EmailRequest $request) {
+        try {
+            $user = $this->authService->checkEmailAvailability($request->email);
 
-        $email = $request->input('email');
-
-        return $this->authService->checkEmailAvailability($email);
+            return response()->json(["is_user_exist" => $user], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    // |--------------------------------------------------------------------------
     public function refreshToken(Request $request) {
         try {
-            return $this->authService->refreshToken($request);
+            $refreshTokenData =  $this->authService->refreshToken($request);
+
+            return response()->json($refreshTokenData, Response::HTTP_OK);
         } catch (\Throwable $e) {
-            return ExceptionHelper::handleException($e);
+            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

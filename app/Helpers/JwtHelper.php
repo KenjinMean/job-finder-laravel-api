@@ -1,5 +1,4 @@
 <?php
-// app\Helpers\JwtHelper.php
 
 namespace App\Helpers;
 
@@ -11,11 +10,13 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class JwtHelper {
   const DEFAULT_TTL_MINUTES = 60;
-  // param minutes
+
+  // |--------------------------------------------------------------------------
   public static function getAccessTokenExpiration($minutes = self::DEFAULT_TTL_MINUTES) {
     return JWTAuth::factory()->getTTL() * $minutes;
   }
 
+  // |--------------------------------------------------------------------------
   public static function getUserFromToken() {
     try {
       $token = JWTAuth::getToken();
@@ -25,23 +26,26 @@ class JwtHelper {
     }
   }
 
+  // |--------------------------------------------------------------------------
   public static function generateAccessToken($user) {
-    return response()->json([
+    return [
       'user' => new UserResource($user),
       'user_info' =>  new UserInfoResource($user->userInfo),
       'access_token' => JWTAuth::fromUser($user),
       'token_type' => 'bearer',
       'expires_in' => self::getAccessTokenExpiration(),
-    ]);
+    ];
   }
 
+  // |--------------------------------------------------------------------------
   public static function refreshAccessToken() {
-    return response()->json([
+    return [
       'access_token' => JWTAuth::parseToken()->refresh(),
       'expires_in' =>  self::getAccessTokenExpiration(),
-    ]);
+    ];
   }
 
+  // |--------------------------------------------------------------------------
   // implement this if already have access to "https" site
   public static function generateAccessTokenAndSetRefreshCookie(User $user) {
     $token = JWTAuth::fromUser($user);

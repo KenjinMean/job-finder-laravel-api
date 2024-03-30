@@ -29,15 +29,12 @@ use App\Http\Controllers\Api\EmailVerificationController;
 # Authentication Routes
 Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
-    // Route::post('register', [AuthController::class, 'register'])->name('register');
-    Route::post('register-user', [AuthController::class, 'registerUser'])->name('register-user');
+    Route::post('register', [AuthController::class, 'register'])->name('register');
     Route::post('refresh-token', [AuthController::class, 'refreshToken'])->name('token.refresh');
     Route::get('check-email-availability', [AuthController::class, 'checkEmail'])->name('checkEmail');
 });
-
 Route::middleware(['auth:api'])->group(function () {
-    Route::post('logout', [AuthController::class, 'logout'])
-        ->name('logout');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 # OAuth service providers route //SOCIALITE
@@ -104,7 +101,9 @@ Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
 
 # SKILL ROUTES
 Route::middleware(['auth:api'])->group(function () {
+    // do not put this route inside skill prefix routes to avoid conflict 
     Route::get('skills/search-skills', [SkillController::class, 'searchSkill'])->name('skills.search');
+
     Route::prefix('skills')->group(function () {
         Route::get('/', [SkillController::class, 'index'])->name('skill.index');
         Route::post('/', [SkillController::class, 'store'])->name('skill.store');
@@ -130,6 +129,10 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/{user}/skills', [UserController::class, 'addUserSkills'])->name('users.add-skills');
         Route::delete('/{user}/skills/{skill}', [UserController::class, 'removeUserSkill'])->name('users.remove-skill');
         Route::delete('/{user}/skills', [UserController::class, 'removeUserSkills'])->name('users.remove-skills');
+
+        // to implement , make user related routes under user prefix
+        Route::get('/{user}/user-info', [UserInfoController::class, 'index'])->name('users.user-info.index');
+        Route::patch('/{users}/user-info/{user-info}', [UserInfoController::class, 'update'])->name('user.user-info.update');
     });
 
     # USER-INFO ROUTES
