@@ -16,10 +16,12 @@ class SocialAuthService {
         return $authorizationUrl;
     }
 
+    // |--------------------------------------------------------------------------
     public function redirectToProvider($provider) {
         return Socialite::driver($provider)->stateless()->redirect();
     }
 
+    // |--------------------------------------------------------------------------
     public function handleProviderCallback($provider) {
 
         $error = request('error');
@@ -69,8 +71,10 @@ class SocialAuthService {
             ]);
         }
 
-        $userData = JwtHelper::generateAccessToken($user);
-        $response = json_encode($userData);
+        // FIX: how to pass the authenticatedUserData directly in the redirect
+        $AuthenticatedUserData = JwtHelper::generateAccessToken($user);
+        $UserResponse =  response()->json($AuthenticatedUserData);
+        $response = json_encode($UserResponse);
         $encodedResponse = urlencode($response);
         return redirect(env('FRONTEND_URL') . '/job-finder-react-frontend/auth/auth-provider-callback?response=' . $encodedResponse);
     }

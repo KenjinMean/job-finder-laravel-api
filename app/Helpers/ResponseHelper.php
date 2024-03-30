@@ -16,11 +16,12 @@ class ResponseHelper {
     ], $statusCode);
   }
 
-  public static function generateErrorResponse($e, $statusCode = Response::HTTP_BAD_REQUEST, $customParameters = []) {
+  public static function generateErrorResponse($e,  $error = "An unexpected error occurred.", $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $customParameters = []) {
     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $statusCode;
 
     $responseData = [
       "error" => [
+        "error" => $error,
         "message" => $e->getMessage()
       ]
     ];

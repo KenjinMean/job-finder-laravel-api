@@ -29,9 +29,9 @@ class AuthController extends Controller {
 
             return response()->json($AuthenticatedUserData, Response::HTTP_OK);
         } catch (UnauthorizedHttpException $e) {
-            return ResponseHelper::generateErrorResponse($e, $e->getCode());
+            return ResponseHelper::generateErrorResponse($e, "Unauthorized Exception", $e->getCode());
         } catch (\Throwable $e) {
-            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::generateErrorResponse($e, "Login failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -42,9 +42,9 @@ class AuthController extends Controller {
 
             return response()->json($AuthenticatedUserData, Response::HTTP_CREATED);
         } catch (AccountConflictException $e) {
-            return ResponseHelper::generateErrorResponse($e, $e->getCode(), ["provider" => $e->getProvider()]);
+            return ResponseHelper::generateErrorResponse($e, "Account Conflict Exception", $e->getCode(), ["provider" => $e->getProvider()]);
         } catch (\Throwable $e) {
-            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::generateErrorResponse($e, "Register failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -56,7 +56,7 @@ class AuthController extends Controller {
 
             return response(['message' => 'User logged out successfully.'], Response::HTTP_OK);
         } catch (\Throwable $e) {
-            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::generateErrorResponse($e, "Logout failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -67,7 +67,7 @@ class AuthController extends Controller {
 
             return response()->json(["is_user_exist" => $user], Response::HTTP_OK);
         } catch (\Throwable $e) {
-            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::generateErrorResponse($e, "Checking email failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -78,7 +78,7 @@ class AuthController extends Controller {
 
             return response()->json($refreshTokenData, Response::HTTP_OK);
         } catch (\Throwable $e) {
-            return ResponseHelper::generateErrorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::generateErrorResponse($e, "Refresh token failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
