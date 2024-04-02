@@ -5,6 +5,13 @@ namespace App\Policies;
 use App\Models\User;
 
 class UserPolicy {
+    public function index(): bool {
+        return false;
+    }
+
+    public function store(): bool {
+        return false;
+    }
 
     public function view(User $user, User $model): bool {
         return $user->id === $model->id;

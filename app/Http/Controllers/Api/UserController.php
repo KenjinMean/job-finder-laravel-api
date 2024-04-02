@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use App\Models\Skill;
 use App\Helpers\JwtHelper;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Services\UserService;
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ManageSkillRequest;
 use App\Http\Resources\SkillResource;
-use App\Http\Requests\UpdateUserRequest;
-use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\ManageSkillRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class UserController extends Controller {
 
@@ -20,67 +22,140 @@ class UserController extends Controller {
         $this->userService = $userService;
     }
 
+    // unused controller for future use only
+    // |--------------------------------------------------------------------------
     public function index() {
-        return response(User::paginate(10));
+        try {
+            $this->authorize('index');
+            return response()->json(["users" => User::paginate(10)]);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::generateErrorResponse($e, "Fetch user Unauthorized access", Response::HTTP_UNAUTHORIZED);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Fetch users failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public function store(RegisterUserRequest $request) {
-        $validatedRequest = $request->validated();
-        $user = $this->userService->createUser($validatedRequest);
-        return response()->json(['message' => $user]);
+    // unused controller for future use only
+    // FIX: create a request for storing user
+    // |--------------------------------------------------------------------------
+    public function store(Request $request) {
+        try {
+            $this->authorize('store');
+            $validatedRequest = $request->validated();
+            $user = $this->userService->createUser($validatedRequest);
+            return response()->json(['message' => $user]);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::generateErrorResponse($e, "Store user Unauthorized access", Response::HTTP_UNAUTHORIZED);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Store users failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    // |--------------------------------------------------------------------------
     public function show() {
-        $user = JwtHelper::getUserFromToken();
-        $this->authorize('view', $user);
-        $response = $this->userService->getUser($user);
-        return response()->json(["user" => $response]);
+        try {
+            $user = JwtHelper::getUserFromToken();
+            $this->authorize('view', $user);
+            $response = $this->userService->getUser($user);
+            return response()->json(["user" => $response]);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::generateErrorResponse($e, "Fetch user Unauthorized access", Response::HTTP_UNAUTHORIZED);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Fetch user failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public function update(UpdateUserRequest $request) {
-        $user = JwtHelper::getUserFromToken();
-        $validatedRequest = $request->validated();
-        $this->authorize('update', $user);
-        $this->userService->updateUser($user, $validatedRequest);
-        return response()->json(['message' => 'Updated successfully']);
+    // unused controller for future use only
+    // FIX: create a request for updating user
+    // |--------------------------------------------------------------------------
+    public function update(Request $request) {
+        try {
+            $user = JwtHelper::getUserFromToken();
+            $validatedRequest = $request->validated();
+            $this->authorize('update', $user);
+            $this->userService->updateUser($user, $validatedRequest);
+            return response()->json(['message' => 'Updated successfully']);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::generateErrorResponse($e, "Update user Unauthorized access", Response::HTTP_UNAUTHORIZED);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Update user failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    // |--------------------------------------------------------------------------
     public function destroy() {
-        $user = JwtHelper::getUserFromToken();
-        $this->authorize('delete', $user);
-        $this->userService->deleteUser($user);
-        return response()->json(['message' => 'User deleted successfully']);
+        try {
+            $user = JwtHelper::getUserFromToken();
+            $this->authorize('delete', $user);
+            $this->userService->deleteUser($user);
+            return response()->json(['message' => 'User deleted successfully']);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::generateErrorResponse($e, "Delete user Unauthorized access", Response::HTTP_UNAUTHORIZED);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Delete user failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Manage User Skill Controllers
+
     /** ------------------------------------------------------------------ */
     public function getUserSkills(User $user) {
-        return response()->json(["skills" => SkillResource::collection($user->skills)]);
+        try {
+            return response()->json(["skills" => SkillResource::collection($user->skills)]);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Fetch user skills failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    /** ------------------------------------------------------------------ */
     public function addUserSkill(User $user, Skill $skill) {
-        $user->skills()->syncWithoutDetaching([$skill->id]);
-        return response()->json(['message' => 'Skill added to user successfully']);
+        try {
+            $user->skills()->syncWithoutDetaching([$skill->id]);
+            return response()->json(['message' => 'Skill added to user successfully']);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Add user skill failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+
+    /**
+     * UPDATE: check if you can refactor the add and remoce user skills to handle if provided with one
+     * skill only it will use the the method to add one skill only, and if provided with array of skills
+     * use the method to add multiple skills 
+     */
     // method to add multiple skills
     // accepts skill_ids array that contains skill ids like this { "skill_ids": ["9", "10"] }
+    /** ------------------------------------------------------------------ */
     public function addUserSkills(ManageSkillRequest $request,  User $user) {
-        $skillIds = $request->input('skill_ids');
-        $user->skills()->syncWithoutDetaching($skillIds);
-        return response()->json(['message' => 'Skill added to user successfully']);
+        try {
+            $skillIds = $request->input('skill_ids');
+            $user->skills()->syncWithoutDetaching($skillIds);
+            return response()->json(['message' => 'Skill added to user successfully']);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Add user skills failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    /** ------------------------------------------------------------------ */
     public function removeUserSkill(User $user, Skill $skill) {
-        $user->skills()->detach($skill);
-        return response()->json(["message" => "Skill removed successfully"]);
+        try {
+            $user->skills()->detach($skill);
+            return response()->json(["message" => "Skill removed successfully"]);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Remove user skill failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     // method to remove multiple skills
     // accepts skill_ids array that contains skill ids like this { "skill_ids": ["9", "10"] }
+    /** ------------------------------------------------------------------ */
     public function removeUserSkills(ManageSkillRequest $request, User $user) {
-        $skillIds = $request->input('skill_ids');
-        $user->skills()->detach($skillIds);
-        return response()->json(["message" => "Skills removed successfully"]);
+        try {
+            $skillIds = $request->input('skill_ids');
+            $user->skills()->detach($skillIds);
+            return response()->json(["message" => "Skills removed successfully"]);
+        } catch (\Throwable $e) {
+            return ResponseHelper::generateErrorResponse($e, "Remove user skills failed.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

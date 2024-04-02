@@ -17,7 +17,6 @@ class ResponseHelper {
   }
 
   public static function generateErrorResponse($e,  $error = "An unexpected error occurred.", $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $customParameters = []) {
-    $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $statusCode;
 
     $responseData = [
       "error" => [
