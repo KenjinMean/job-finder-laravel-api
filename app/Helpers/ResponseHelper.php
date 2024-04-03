@@ -25,6 +25,9 @@ class ResponseHelper {
       ]
     ];
 
+    $exceptionCode = $e->getCode();
+    $statusCode = $statusCode ?: ($exceptionCode ?: Response::HTTP_INTERNAL_SERVER_ERROR);
+
     $responseData = array_merge($responseData, $customParameters);
 
     Log::channel('dev')->debug("Error has occurred", [

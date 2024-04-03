@@ -15,9 +15,9 @@ class CheckTokenExpiration {
             JWTAuth::checkOrFail($token);
             return $next($request);
         } catch (TokenExpiredException $e) {
-            return ResponseHelper::errorResponse('Token has expired', Response::HTTP_UNAUTHORIZED, $e->getMessage(), __FILE__);
+            return ResponseHelper::generateErrorResponse($e, "jwt error", Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
-            return ResponseHelper::errorResponse('Failed to authenticate token', Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage(), __FILE__);
+            return ResponseHelper::generateErrorResponse($e, "jwt error", Response::HTTP_UNAUTHORIZED);
         }
     }
 }
