@@ -11,7 +11,6 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('name');
             $table->string('location')->nullable();
             $table->string('company_logo')->nullable();
@@ -19,14 +18,15 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->unsignedBigInteger('company_size_id')->nullable();
             $table->timestamps();
 
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('company_size_id')->references('id')->on('company_size_categories')->onDelete('set null');
+
+            $table->unsignedBigInteger('company_size_id')->nullable();
+            $table->foreign('company_size_id')->references('id')->on('company_size_categories')->onDelete('cascade'); // Change to cascade
         });
     }
-
     /**
      * Reverse the migrations.
      */

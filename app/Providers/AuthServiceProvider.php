@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Company;
 use App\Models\Job;
 use App\Models\Skill;
 use App\Models\UserWorkExperience;
@@ -21,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider {
     protected $policies = [
         Skill::class => SkillPolicy::class,
         UserWorkExperience::class => UserWorkExperiencePolicy::class,
+        Company::class => CompanyPolicy::class,
     ];
 
     /**

@@ -19,7 +19,7 @@ class CompanyUpdateImageRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            "company_logo" => "nullable|image"
+            'company_logo'  => 'required|file|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

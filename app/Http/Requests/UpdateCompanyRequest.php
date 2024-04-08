@@ -19,11 +19,13 @@ class UpdateCompanyRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'name' => 'string',
-            'website'  => 'string',
-            'location'  => 'string',
-            'description'  => 'string',
-            'industry' => 'string',
+            'name' => 'string|nullable',
+            'website'  => 'string|nullable',
+            'location'  => 'string|nullable',
+            'description'  => 'string|nullable',
+            'email' => 'string|nullable',
+            'phone' => 'string|nullable',
+            'company_size_id' => 'integer|nullable',
         ];
     }
 }

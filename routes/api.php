@@ -85,18 +85,19 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 });
 
 # COMPANY ROUTES
-// convert to RESTful api
-Route::middleware(['auth:api', 'verified'])->group(function () {
-    Route::get('companies/user-companies', [CompanyController::class, 'showUserCompanies'])->name('companies.user-companies');
-    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
-    Route::post('/companies', [CompanyController::class, 'store'])->name('company.store');
-    Route::patch('/companies/{company}', [CompanyController::class, 'update'])->name('company.update');
-    Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('company.destroy');
-    Route::patch('companies/update-company-image/{company}', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
-});
+Route::prefix('companies')->group(function () {
+    Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
+        Route::get('/{company}', [CompanyController::class, 'show'])->name('companies.show');
+    });
 
-Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
-    Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('company.show');
+    Route::middleware(['auth:api', 'verified'])->group(function () {
+        Route::get('/', [CompanyController::class, 'index'])->name('companies.index');
+        Route::post('/', [CompanyController::class, 'store'])->name('companies.store');
+        Route::patch('/{company}', [CompanyController::class, 'update'])->name('companies.update');
+        Route::patch('/{company}/company-image', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
+        Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+        Route::delete('/{company}/company-logo', [CompanyController::class, 'deleteCompanyLogo'])->name('companies.delete-company-logo');
+    });
 });
 
 # SKILL ROUTES
@@ -116,6 +117,7 @@ Route::middleware(['auth:api'])->group(function () {
 # USER ROUTES
 Route::middleware(['auth:api'])->group(function () {
     # USER ROUTES
+    // make public user route that anyone can view
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index');
         Route::post('/', [UserController::class, 'store'])->name('users.store');

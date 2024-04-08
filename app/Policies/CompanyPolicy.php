@@ -2,20 +2,20 @@
 
 namespace App\Policies;
 
-use App\Models\Company;
 use App\Models\User;
+use App\Models\Company;
 
 class CompanyPolicy {
 
-    public function update(User $user, Company $company): bool {
-        return $user->companies->contains($company);
+    public function index(): bool {
+        return false;
     }
 
-    public function updateCompanyImage(User $user, Company $company): bool {
-        return $user->companies->contains($company);
+    public function update(User $user, Company $company): bool {
+        return $user->id === $company->user_id;
     }
 
     public function delete(User $user, Company $company): bool {
-        return $user->companies->contains($company);
+        return $user->id === $company->user_id;
     }
 }

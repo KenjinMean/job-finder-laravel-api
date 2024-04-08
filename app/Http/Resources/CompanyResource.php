@@ -15,12 +15,13 @@ class CompanyResource extends JsonResource {
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'company_logo' => $this->company_logo,
-            'company_size' => $this->companySizeCategory->size,
-            'location' => $this->location,
             'website' => $this->website,
+            'location' => $this->location,
             'description' => $this->description,
-            'industry' => $this->industry,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'company_size' => $this->companySizeCategory->size,
+            'company_logo' => $this->company_logo,
         ];
     }
 }

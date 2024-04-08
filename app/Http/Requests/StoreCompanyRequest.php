@@ -19,12 +19,14 @@ class StoreCompanyRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'company_logo' => 'nullable|image',
-            'name' => 'required',
-            'website'  => 'required',
-            'location'  => 'required',
-            'description'  => 'required',
-            'industry' => 'required',
+            'name' => 'required|nullable',
+            'website'  => 'string|nullable',
+            'location'  => 'string|nullable',
+            'description'  => 'string|nullable',
+            'company_logo'  => 'nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'email' => 'string|nullable',
+            'phone' => 'string|nullable',
+            'company_size_id' => 'integer|nullable',
         ];
     }
 }

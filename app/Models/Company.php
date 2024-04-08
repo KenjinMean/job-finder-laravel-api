@@ -19,8 +19,10 @@ class Company extends Model {
         'name',
         'website',
         'location',
+        'email',
+        'phone',
         'description',
-        'industry',
+        'company_size_id',
     ];
 
     public function job() {
