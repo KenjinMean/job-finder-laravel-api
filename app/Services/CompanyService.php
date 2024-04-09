@@ -31,41 +31,37 @@ class CompanyService {
     }
 
     // |--------------------------------------------------------------------------
+    public function deleteCompany($company): void {
+        $company->delete();
+    }
+
+    // |--------------------------------------------------------------------------
     public function updateCompanyLogo($validatedRequest, $company): void {
+        $newCompanyLogoPath = Storage::disk('public')->put('company_logos', $validatedRequest['company_logo']);
 
-        if (empty($validatedRequest['company_logo'])) {
-            return;
+        $existingCompanyLogo = $company->company_logo;
+
+
+        if ($existingCompanyLogo && Storage::disk('public')->exists(str_replace('storage/', '', $existingCompanyLogo))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $existingCompanyLogo));
         }
 
-        $oldCompanyLogo = $company->company_logo;
-
-        if ($oldCompanyLogo && Storage::disk('public')->exists($oldCompanyLogo)) {
-            Storage::disk('public')->delete($oldCompanyLogo);
-        }
-
-        $companyImagePath = Storage::disk('public')->put('company_logos', $validatedRequest['company_logo']);
         // Convert backslashes to forward slashes in file path
-        $companyImagePath = 'storage/' . str_replace('\\', '/', $companyImagePath);
-        $company->company_logo = $companyImagePath;
+        $newCompanyLogoPath = 'storage/' . str_replace('\\', '/', $newCompanyLogoPath);
+        $company->company_logo = $newCompanyLogoPath;
 
         $company->save();
     }
 
     // |--------------------------------------------------------------------------
     public function deleteCompanyLogo($company): void {
-        $companyLogo = $company->company_logo;
+        $existingCompanyLogo = $company->company_logo;
 
-        if ($companyLogo !== null) {
-            if (Storage::disk('public')->exists($companyLogo)) {
-                Storage::disk('public')->delete($companyLogo);
-            }
+        if ($existingCompanyLogo && Storage::disk('public')->exists(str_replace('storage/', '', $existingCompanyLogo))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $existingCompanyLogo));
+
             $company->company_logo = null;
             $company->save();
         }
-    }
-
-    // |--------------------------------------------------------------------------
-    public function deleteCompany($company): void {
-        $company->delete();
     }
 }
