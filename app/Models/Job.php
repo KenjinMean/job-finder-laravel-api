@@ -11,14 +11,17 @@ class Job extends Model {
     use HasFactory;
 
     protected $fillable = [
-        "company_id",
-        "category_id",
         "title",
         "location",
         "description",
-        "requirements",
+        "qualifications",
+        "responsibilities",
         "salary",
-        "posted_at",
+        "benefits",
+        "experience_level",
+        "category",
+        "company_id",
+        "application_deadline_at",
         "slug",
     ];
 
@@ -50,20 +53,49 @@ class Job extends Model {
         parent::boot();
 
         static::creating(function ($job) {
-            $baseSlug = Str::slug($job->title . ' -at- ' . $job->company->name);
+            $job->generateSlug();
+        });
 
-            // Check if a job with the same slug already exists
-            $count = self::where('slug', $baseSlug)->count();
-
-            if ($count > 0) {
-                // Append a unique suffix to the slug
-                $uniqueSuffix = time(); // used time as unique identifier
-                $slug = $baseSlug . '-' . $uniqueSuffix;
-            } else {
-                $slug = $baseSlug;
-            }
-
-            $job->slug = $slug;
+        static::updating(function ($job) {
+            $job->generateSlug();
         });
     }
+
+    public function generateSlug() {
+        $baseSlug = Str::slug($this->title . ' -at- ' . $this->company->name);
+
+        // Check if a job with the same slug already exists
+        $count = self::where('slug', $baseSlug)->count();
+
+        if ($count > 0) {
+            // Append a unique suffix to the slug
+            $uniqueSuffix = time(); // used time as unique identifier
+            $slug = $baseSlug . '-' . $uniqueSuffix;
+        } else {
+            $slug = $baseSlug;
+        }
+
+        $this->slug = $slug;
+    }
+
+    // protected static function boot() {
+    //     parent::boot();
+
+    //     static::creating(function ($job) {
+    //         $baseSlug = Str::slug($job->title . ' -at- ' . $job->company->name);
+
+    //         // Check if a job with the same slug already exists
+    //         $count = self::where('slug', $baseSlug)->count();
+
+    //         if ($count > 0) {
+    //             // Append a unique suffix to the slug
+    //             $uniqueSuffix = time(); // used time as unique identifier
+    //             $slug = $baseSlug . '-' . $uniqueSuffix;
+    //         } else {
+    //             $slug = $baseSlug;
+    //         }
+
+    //         $job->slug = $slug;
+    //     });
+    // }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreJobRequest extends FormRequest {
+class UpdateworkLocationTypeRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -19,12 +19,8 @@ class StoreJobRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'company_id' => 'required',
-            'title' => 'required',
-            'location' => 'required',
-            'description' => 'required',
-            'requirements' => 'required',
-            'salary' => 'required',
+            'work_location_types' => 'nullable|array',
+            'work_location_types.*' => 'exists:work_location_types,id',
         ];
     }
 }

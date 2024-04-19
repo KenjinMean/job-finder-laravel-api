@@ -19,8 +19,8 @@ class UpdateJobTypeRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'job_type' => 'nullable|array',
-            'job_type.*' => 'exists:job_types,id'
+            'job_types' => 'nullable|array',
+            'job_types.*' => 'exists:job_types,id',
         ];
     }
 }

@@ -30,7 +30,7 @@ class ResponseHelper {
 
     $responseData = array_merge($responseData, $customParameters);
 
-    Log::channel('dev')->debug("Error has occurred", [
+    Log::debug("Error has occurred", [
       'code' => $e->getCode(),
       'message' => $e->getMessage(),
       'file' => $e->getFile(),

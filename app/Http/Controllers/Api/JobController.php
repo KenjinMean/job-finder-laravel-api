@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
-use Throwable;
 use App\Models\Job;
+use App\Models\Skill;
 use App\Services\JobService;
-use Illuminate\Http\Request;
-use App\Helpers\ExceptionHelper;
+use Illuminate\Http\Response;
+use App\Http\Requests\JobRequest;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\FilterJobsRequest;
-use App\Http\Requests\StoreJobRequest;
 use App\Http\Requests\SearchJobRequest;
-use App\Http\Requests\UpdateJobRequest;
 use App\Http\Requests\UpdateJobTypeRequest;
 use App\Http\Requests\UpdateJobSkillRequest;
+use App\Http\Requests\FetchJobPostingsRequest;
+use App\Http\Requests\UpdateworkLocationTypeRequest;
 
 class JobController extends Controller {
 
@@ -24,125 +23,171 @@ class JobController extends Controller {
         $this->jobService = $jobService;
     }
 
-    public function index() {
-        try {
-            return $this->jobService->index();
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    public function store(StoreJobRequest $request) {
-        try {
-            $validatedRequest = $request->validated();
-            $this->jobService->createJob($validatedRequest);
-            return response()->json(['message' => 'Company created successfully']);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    /* Fetch job details using id */
-    // public function show(int $jobId): JsonResponse {
-    //     try {
-    //         $job = $this->jobService->showJob($jobId);
-    //         return response()->json(["job" => $job]);
-    //     } catch (Throwable $e) {
-    //         return ExceptionHelper::handleException($e);
-    //     }
-    // }
-
-    /* FETCH job details using slug */
-    public function show($jobSlug): JsonResponse {
-        $job = $this->jobService->showJob($jobSlug);
-        return response()->json(["job" => $job]);
-    }
-
-    public function update(UpdateJobRequest $request, Job $job) {
-        $this->authorize("update", $job);
+    // |--------------------------------------------------------------------------
+    public function index(FetchJobPostingsRequest $request) {
         $validatedRequest = $request->validated();
-        $this->jobService->updateJob($validatedRequest, $job);
-        return response()->json(["message" => "Updated job successfully"]);
+
+        return $this->jobService->index($validatedRequest);
     }
 
+    // |--------------------------------------------------------------------------
+    public function store(JobRequest $request) {
+        $validatedRequest = $request->validated();
+
+        $job = new Job;
+        $companyId = $validatedRequest['company_id'];
+        // Passes the Job instance and the associated company ID as parameters
+        // to let Laravel know what policy to run.
+        $this->authorize('store', [$job,  $companyId]);
+
+        $this->jobService->store($validatedRequest);
+
+        return response()->json(['message' => 'Company created successfully'], Response::HTTP_CREATED);
+    }
+
+    // |--------------------------------------------------------------------------
+    /**
+     * Fetch job details using its ID.
+     *
+     * @param int $jobId The ID of the job.
+     * @return \Illuminate\Http\JsonResponse A JSON response containing the job details.
+     */
+    public function showById(int $jobId): JsonResponse {
+        $job = $this->jobService->showById($jobId);
+
+        return response()->json(["job" => $job], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    /**
+     * Fetch job details using its slug.
+     *
+     * @param string $jobSlug The slug of the job.
+     * @return \Illuminate\Http\JsonResponse A JSON response containing the job details.
+     */
+    public function showBySlug($jobSlug): JsonResponse {
+        $job = $this->jobService->showBySlug($jobSlug);
+
+        return response()->json(["job" => $job], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function update(JobRequest $request, Job $job) {
+        $this->authorize("update", $job);
+
+        $validatedRequest = $request->validated();
+        $this->jobService->update($validatedRequest, $job);
+
+        return response()->json(["message" => "Job updated successfully"], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
     public function destroy(Job $job) {
-        try {
-            $this->authorize('delete', $job);
-            $this->jobService->deleteJob($job);
-            return response()->json(["message" => "Job deleted successfully"]);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        $this->authorize('delete', $job);
+
+        $this->jobService->destroy($job);
+
+        return response()->json(["message" => "Job deleted successfully"], Response::HTTP_OK);
     }
 
-    // PAGINATED JOBS by TEN
-    public function getJobPostings() {
-        try {
-            return $this->jobService->getPaginatedJobsWithDetails();
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
-    }
-
-    // FETCH JOBS by TEN
-    // public function getJobPostings(Request $request) {
-    //     try {
-    //         $page = $request->input('page', 1);
-    //         return $this->jobService->getJobPostings($page);
-    //     } catch (Throwable $e) {
-    //         return ExceptionHelper::handleException($e);
-    //     }
-    // }
-
+    // |--------------------------------------------------------------------------
     public function searchJobs(SearchJobRequest $request) {
-        try {
-            $validatedData = $request->validated();
-            $keyword = $validatedData['keyword'];
-            return $this->jobService->searchJobs($keyword);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+        // implemented filter on index that can handle searching filter. acn update frontend and remove this
+        $validatedRequest = $request->validated();
+        return $this->jobService->searchJobs($validatedRequest);
     }
 
-    public function searchJobSuggestions(Request $request) {
-        try {
-            $keyword = $request->query('keyword');
-            return $this->jobService->searchJobsSuggestions($keyword);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+    // |--------------------------------------------------------------------------
+    public function searchJobSuggestions(SearchJobRequest $request) {
+        $validatedRequest = $request->validated();
+        $suggestions = $this->jobService->searchJobSuggestions($validatedRequest);
+
+        return response()->json(['suggestions' => $suggestions], Response::HTTP_OK);
     }
 
-    public function filterJobs(FilterJobsRequest $request) {
-        try {
-            return $this->jobService->filterJobs($request);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+    // |--------------------------------------------------------------------------
+    /**
+     * Add a single skill to the specified job.
+     *
+     * @param \App\Models\Job $job The job to which the skill will be added.
+     * @param \App\Models\Skill $skill The skill to be added to the job.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation.
+     */
+    public function jobSkillAdd(Job $job, Skill $skill) {
+        $this->authorize('update', $job);
+
+        $this->jobService->jobSkillAdd($skill, $job);
+
+        return response()->json(["message" => "Job skills added successfully."], Response::HTTP_OK);
     }
 
-    public function updateJobSkills(UpdateJobSkillRequest $request, Job $job) {
-        try {
-            $this->authorize('updateJobSkill', $job);
-            $skills = $request->validated()['skills'];
-            $this->jobService->updateJobSkills($skills, $job);
-            return response()->json([
-                "message" => "Job skills updated successfully."
-            ]);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+    // |--------------------------------------------------------------------------
+    /**
+     * Add multiple skills to the specified job based on the validated request.
+     *
+     * @param \App\Http\Requests\UpdateJobSkillRequest $request The validated request containing the skills to be added.
+     * @param \App\Models\Job $job The job to which the skills will be added.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation.
+     */
+    public function jobSkillsAdd(UpdateJobSkillRequest $request, Job $job) {
+        $this->authorize('update', $job);
+
+        $validatedRequest = $request->validated();
+        $this->jobService->jobSkillsAdd($validatedRequest, $job);
+
+        return response()->json(["message" => "Job skills added successfully."], Response::HTTP_OK);
     }
 
-    public function updateJobType(UpdateJobTypeRequest $request, Job $job) {
-        try {
-            $jobTypes = $request->validated()['job_type'];
-            $this->jobService->updateJobType($jobTypes, $job);
-            return response()->json([
-                "message" => "Job type updated successfully."
-            ]);
-        } catch (Throwable $e) {
-            return ExceptionHelper::handleException($e);
-        }
+    // |--------------------------------------------------------------------------
+    /**
+     * Remove a single skill from the specified job.
+     *
+     * @param \App\Models\Job $job The job from which the skill will be removed.
+     * @param \App\Models\Skill $skill The skill to be removed from the job.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation.
+     */
+    public function jobSkillRemove(Job $job, Skill $skill) {
+        $this->authorize('update', $job);
+
+        $this->jobService->jobSkillRemove($skill, $job);
+
+        return response()->json(["message" => "Job skill removed successfully."], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    /**
+     * Remove multiple skills from the specified job based on the validated request.
+     *
+     * @param \App\Http\Requests\UpdateJobSkillRequest $request The validated request containing the skills to be removed.
+     * @param \App\Models\Job $job The job from which the skills will be removed.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation.
+     */
+    public function jobSkillsRemove(UpdateJobSkillRequest $request, Job $job) {
+        $this->authorize('update', $job);
+
+        $validatedRequest = $request->validated();
+        $this->jobService->jobSkillsRemove($validatedRequest, $job);
+
+        return response()->json(["message" => "Job skills removed successfully."], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function updateJobTypes(UpdateJobTypeRequest $request, Job $job) {
+        $this->authorize('update', $job);
+
+        $validatedRequest = $request->validated();
+        $this->jobService->updateJobTypes($validatedRequest, $job);
+
+        return response()->json(["message" => "Job type updated successfully."], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function updateWorkLocationTypes(UpdateworkLocationTypeRequest $request, Job $job) {
+        $this->authorize('update', $job);
+
+        $validatedRequest = $request->validated();
+        $this->jobService->updateWorkLocationTypes($validatedRequest, $job);
+
+        return response()->json(["message" => "Work Location type updated successfully."], Response::HTTP_OK);
     }
 }

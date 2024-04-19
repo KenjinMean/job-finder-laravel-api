@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Throwable;
 use Illuminate\Http\Response;
 use App\Helpers\ResponseHelper;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -42,6 +43,12 @@ class Handler extends ExceptionHandler {
     }
 
     protected function handleApiExceptions($request, Throwable $exception) {
+        logger()->debug($exception);
+
+        if ($exception instanceof QueryException) {
+            return ResponseHelper::generateErrorResponse($exception, "A database query exception occurred while processing the request.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
         if ($exception instanceof ValidationException) {
             return ResponseHelper::generateErrorResponse($exception, "Validation Error", Response::HTTP_UNPROCESSABLE_ENTITY);
         }

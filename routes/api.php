@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\EmailVerificationController;
 |
 */
 
+// NOTE: do not rearange routes to prevent route conflict
+
 # Authentication Routes
 Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -66,23 +68,34 @@ Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
 });
 
 # JOB ROUTES
-// convert to RESTful api
-Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
-    Route::get('/jobs/get-job-posting', [JobController::class, 'getJobPostings'])->name('job.get-job-posting');
-    Route::get('/jobs/search-jobs', [JobController::class, 'searchJobs'])->name('job.search');
-    Route::get('/jobs/search-jobs-suggestions', [JobController::class, 'searchJobSuggestions'])->name('job.search-job-suggestions');
-    Route::get('/jobs/filter-jobs', [JobController::class, 'filterJobs'])->name('job.filter');
-    Route::post('/jobs/update-job-type/{job}', [JobController::class, 'updateJobType'])->name('job.update-job-type');
-    Route::get('/jobs/{jobSlug}', [JobController::class, 'show'])->name('job.show'); //this uses slug to get the jobs
-    // Route::get('/jobs/{job}', [JobController::class, 'show'])->name('job.show'); //this uses job id to get the jobs
+Route::prefix('jobs')->group(function () {
+    // public Job routes.
+    Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
+        Route::get('/', [JobController::class, 'index'])->name('jobs.index');
+        Route::get('/search-jobs', [JobController::class, 'searchJobs'])->name('jobs.search');
+        Route::get('/search-jobs-suggestions', [JobController::class, 'searchJobSuggestions'])->name('jobs.search-job-suggestions');
+        Route::get('/{id}', [JobController::class, 'showById'])->where('id', '[0-9]+')->name('jobs.show-by-id');
+        Route::get('/{jobSlug}', [JobController::class, 'showBySlug'])->where('jobSlug', '[a-zA-Z0-9-]+')->name('jobs.show-by-slug');
+    });
+
+
+    // private Job routes
+    Route::middleware(['auth:api', 'verified'])->group(function () {
+        Route::post('/', [JobController::class, 'store'])->name('jobs.store');
+        Route::patch('/{job}', [JobController::class, 'update'])->name('jobs.update');
+        Route::delete('/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
+
+        Route::patch('/{job}/skills', [JobController::class, 'jobSkillsAdd'])->name('jobs.skills.add');
+        Route::patch('/{job}/skills/{skill}', [JobController::class, 'jobSkillAdd'])->name('jobs.skill.add');
+        Route::delete('/{job}/skills', [JobController::class, 'jobSkillsRemove'])->name('jobs.skills.remove');
+        Route::delete('/{job}/skills/{skill}', [JobController::class, 'jobSkillRemove'])->name('jobs.skill.remove');
+
+        Route::patch('/{job}/job-types', [JobController::class, 'updateJobTypes'])->name('jobs.update-job-types');
+
+        Route::patch('/{job}/work-location-types', [JobController::class, 'updateWorkLocationTypes'])->name('jobs.update-work-location-types');
+    });
 });
 
-Route::middleware(['auth:api', 'verified'])->group(function () {
-    Route::post('/jobs', [JobController::class, 'store'])->name('job.store');
-    Route::patch('/jobs/update-job-skills/{job}', [JobController::class, 'updateJobSkills'])->name('job.update-job-skill');
-    Route::patch('/jobs/{job}', [JobController::class, 'update'])->name('job.update');
-    Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('job.destroy');
-});
 
 # COMPANY ROUTES
 Route::prefix('companies')->group(function () {
@@ -102,7 +115,8 @@ Route::prefix('companies')->group(function () {
 
 # SKILL ROUTES
 Route::middleware(['auth:api'])->group(function () {
-    // do not put this route inside skill prefix routes to avoid conflict 
+    // do not put this route inside skill prefix routes to avoid conflict
+    // make search skill a non auth routes
     Route::get('skills/search-skills', [SkillController::class, 'searchSkill'])->name('skills.search');
 
     Route::prefix('skills')->group(function () {
@@ -118,6 +132,7 @@ Route::middleware(['auth:api'])->group(function () {
 Route::middleware(['auth:api'])->group(function () {
     # USER ROUTES
     // make public user route that anyone can view
+    // refactor to remove injecting user id to route and use token instead
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index');
         Route::post('/', [UserController::class, 'store'])->name('users.store');
@@ -133,8 +148,10 @@ Route::middleware(['auth:api'])->group(function () {
         Route::delete('/{user}/skills', [UserController::class, 'removeUserSkills'])->name('users.remove-skills');
 
         // to implement , make user related routes under user prefix
-        Route::get('/{user}/user-info', [UserInfoController::class, 'index'])->name('users.user-info.index');
-        Route::patch('/{users}/user-info/{user-info}', [UserInfoController::class, 'update'])->name('user.user-info.update');
+        Route::prefix('/{user}/user-info')->group(function () {
+            Route::get('/', [UserInfoController::class, 'index'])->name('users.user-info.index');
+            Route::patch('/{user-info}', [UserInfoController::class, 'update'])->name('user.user-info.update');
+        });
     });
 
     # USER-INFO ROUTES
@@ -158,4 +175,27 @@ Route::middleware(['auth:api'])->group(function () {
 
     # USER EDUCATIONS ROUTES Rotues
     Route::apiResource('user-educations', UserEducationController::class);
+});
+
+
+#VERSION 2 ROUTES
+Route::prefix('v2')->group(function () {
+    Route::prefix('users')->group(function () {
+        // Users Resource
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{user}', [UserController::class, 'show']);
+        Route::patch('/{user}', [UserController::class, 'update']);
+        Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['verified']);
+
+        // Users Job
+        Route::get('/jobs', [UserController::class, 'index']);
+
+        // make a UserSkillController
+        Route::get('/skills', [UserController::class, 'getUserSkills']);
+        Route::post('/skills/{skill}', [UserController::class, 'addUserSkill']);
+        Route::post('/skills', [UserController::class, 'addUserSkills']);
+        Route::delete('/skills/{skill}', [UserController::class, 'removeUserSkill']);
+        Route::delete('/skills', [UserController::class, 'removeUserSkills']);
+    });
 });
