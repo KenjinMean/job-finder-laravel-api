@@ -141,10 +141,20 @@ Route::prefix('skills')->group(function () {
 # USER ROUTES
 Route::middleware(['auth:api'])->group(function () {
     Route::prefix('users')->group(function () {
-        # USERS USER-INFO ROUTES - unused
+
+        # USER CONTACTS ROUTES
+        Route::prefix('/user-contact')->group(function () {
+            Route::get('/', [UserContactController::class, 'index']);
+            Route::post('/', [UserContactController::class, 'store']);
+            Route::patch('/', [UserContactController::class, 'update']);
+            Route::delete('/', [UserContactController::class, 'destroy']);
+        });
+
+        # USERS USER-INFO ROUTES
         Route::prefix('/user-info')->group(function () {
             Route::get('/', [UserInfoController::class, 'index']);
             Route::patch('/', [UserInfoController::class, 'update']);
+            // add delte profile nad cover route
             Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage']);
             Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage']);
         });
@@ -170,20 +180,13 @@ Route::middleware(['auth:api'])->group(function () {
         Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['verified'])->name('users.destroy');
     });
 
+    // test remove this route replaced by the restful users user-info routes
     # USER-INFO ROUTES
     Route::prefix('user-info')->group(function () {
         Route::get('/', [UserInfoController::class, 'index'])->name('user-info.index');
         Route::patch('/', [UserInfoController::class, 'update'])->name('user-info.update');
         Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-info.update-cover');
         Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-info.update-profile-image');
-    });
-
-    # USER CONTACTS ROUTES
-    Route::prefix('user-contact')->group(function () {
-        Route::get('/', [UserContactController::class, 'index'])->name('user-contact.index');
-        Route::post('/', [UserContactController::class, 'store'])->name('user-contact.store');
-        Route::patch('/', [UserContactController::class, 'update'])->name('user-contact.update');
-        Route::delete('/', [UserContactController::class, 'destroy'])->name('user-contact.delete');
     });
 
     # USER EXPERIENCES ROUTES
