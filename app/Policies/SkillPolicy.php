@@ -7,7 +7,7 @@ use App\Models\User;
 
 class SkillPolicy {
     public function viewAll() {
-        return false;
+        return true;
     }
 
     public function create(): bool {

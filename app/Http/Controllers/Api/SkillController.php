@@ -17,41 +17,44 @@ class SkillController extends Controller {
         $this->skillService = $skillService;
     }
 
-    public function index() {
-        $this->authorize('viewAll', Skill::class);
-        return $this->skillService->getSkills();
+    /** ------------------------------------------------------------------ */
+    public function index(SearchSkillRequest $request) {
+        $validatedRequest = $request->validated();
+        return $this->skillService->index($validatedRequest);
     }
 
+    /** ------------------------------------------------------------------ */
     public function store(StoreSkillRequest $request) {
         $validatedRequest = $request->validated();
         $this->authorize('create');
-        $this->skillService->createSkill($validatedRequest);
+        $this->skillService->store($validatedRequest);
+
         return response()->json(['message' => "Skill created successfully"]);
     }
 
+    /** ------------------------------------------------------------------ */
     public function show(Skill $skill) {
         $this->authorize('viewAll', Skill::class);
+
         return response()->json($skill);
     }
 
+    /** ------------------------------------------------------------------ */
     public function update(UpdateSkillRequest $request, $skillId) {
         $skill = Skill::findOrFail($skillId);
         $validatedRequest = $request->validated();
         $this->authorize('update', $skill);
-        $this->skillService->updateSkill($skill, $validatedRequest);
+        $this->skillService->update($skill, $validatedRequest);
+
         return response()->json(["message" => "Skill updated successfully"]);
     }
 
+    /** ------------------------------------------------------------------ */
     public function destroy($skillId) {
         $skill = Skill::findOrFail($skillId);
         $this->authorize('delete', $skill);
-        $this->skillService->deleteSkill($skill);
-        return response()->json(["message" => "Skill deleted successfully"]);
-    }
+        $this->skillService->delete($skill);
 
-    public function searchSkill(SearchSkillRequest $request) {
-        $keyword = $request->validated()['keyword'];
-        $skill = $this->skillService->searchSkill($keyword);
-        return response()->json(["skills" => $skill]);
+        return response()->json(["message" => "Skill deleted successfully"]);
     }
 }
