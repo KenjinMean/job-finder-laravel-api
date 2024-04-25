@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\JwtHelper;
+use Illuminate\Http\Response;
 use App\Services\UserInfoService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateUserInfoRequest;
-use App\Http\Requests\UpdateCoverImageRequest;
-use App\Http\Requests\UpdateProfileImageRequest;
-use Illuminate\Http\Response;
+use App\Http\Requests\users\UserInfoStoreRequest;
+use App\Http\Requests\users\UserInfoUpdateReqeust;
+use App\Http\Requests\users\UserInfoCoverImageUpdateRequest;
+use App\Http\Requests\users\UserInfoProfileImageUpdateRequest;
 
 class UserInfoController extends Controller {
 
@@ -18,30 +19,69 @@ class UserInfoController extends Controller {
         $this->userInfoService = $userInfoService;
     }
 
+    // |--------------------------------------------------------------------------
     public function index() {
         $user = JwtHelper::getUserFromToken();
         $userInfo = $this->userInfoService->index($user);
+
         return response()->json($userInfo);
     }
 
-    public function update(UpdateUserInfoRequest $request) {
+    // |--------------------------------------------------------------------------
+    public function store(UserInfoStoreRequest $request) {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
-        $this->userInfoService->updateUserInfo($user, $validatedRequest);
-        return response()->json(['message' => 'Updated successfully'], Response::HTTP_OK);
+        $this->userInfoService->store($user, $validatedRequest);
+
+        return response()->json(['message' => 'User Info Created successfully'], Response::HTTP_OK);
     }
 
-    public function updateProfileImage(UpdateProfileImageRequest $request) {
+    // |--------------------------------------------------------------------------
+    public function update(UserInfoUpdateReqeust $request) {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
-        $this->userInfoService->updateProfileImage($user, $validatedRequest);
+        $this->userInfoService->update($user, $validatedRequest);
+
+        return response()->json(['message' => 'User Info Updated successfully'], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function updateProfileImage(UserInfoProfileImageUpdateRequest $request) {
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userInfoService->updateImage($user, $validatedRequest, "profile");
+
         return response()->json(['message' => 'Profile photo updated successfully'], Response::HTTP_OK);
     }
 
-    public function updateCoverImage(UpdateCoverImageRequest $request) {
+    // |--------------------------------------------------------------------------
+    public function updateCoverImage(UserInfoCoverImageUpdateRequest $request) {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
-        $this->userInfoService->updateCoverImage($user, $validatedRequest);
+        $this->userInfoService->updateImage($user, $validatedRequest, "cover");
+
         return response()->json(['message' => 'Cover photo updated successfully'], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function delete() {
+        $user = JwtHelper::getUserFromToken();
+        $this->userInfoService->delete($user);
+
+        return response()->json(['message' => 'User Info Deleted successfully'], Response::HTTP_OK);
+    }
+
+    public function deleteProfileImage() {
+        $user = JwtHelper::getUserFromToken();
+        $this->userInfoService->deleteImage($user, "profile");
+
+        return response()->json(['message' => 'Profile photo deleted successfully'], Response::HTTP_OK);
+    }
+
+    public function deleteCoverImage() {
+        $user = JwtHelper::getUserFromToken();
+        $this->userInfoService->deleteImage($user, "cover");
+
+        return response()->json(['message' => 'Cover photo deleted successfully'], Response::HTTP_OK);
     }
 }
