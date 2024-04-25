@@ -63,7 +63,11 @@ class Handler extends ExceptionHandler {
 
         if ($exception instanceof HttpException) {
             $statusCode = $exception->getStatusCode();
-            $errorMessage = "An error occurred while processing your request. The server responded with an HTTP $statusCode error. Please check your request and try again. If the problem persists, contact support for assistance.";
+            $errorMessage = $exception->getMessage(); // Get the error message from the HttpException
+            // If the error message is empty or null, use a default message
+            if (empty($errorMessage)) {
+                $errorMessage = "An error occurred while processing your request. The server responded with an HTTP $statusCode error. Please check your request and try again. If the problem persists, contact support for assistance.";
+            }
             return ResponseHelper::generateErrorResponse($exception, $errorMessage, $statusCode);
         }
 
