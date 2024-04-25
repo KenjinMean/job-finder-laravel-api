@@ -153,10 +153,15 @@ Route::middleware(['auth:api'])->group(function () {
         # USERS USER-INFO ROUTES
         Route::prefix('/user-info')->group(function () {
             Route::get('/', [UserInfoController::class, 'index']);
+            Route::post('/', [UserInfoController::class, 'store']);
             Route::patch('/', [UserInfoController::class, 'update']);
-            // add delte profile nad cover route
+            Route::delete('/', [UserInfoController::class, 'delete']);
+
             Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage']);
             Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage']);
+
+            Route::delete('/cover-image', [UserInfoController::class, 'deleteCoverImage']);
+            Route::delete('/profile-image', [UserInfoController::class, 'deleteProfileImage']);
         });
 
         # USERS SKILLS ROUTES
@@ -168,30 +173,22 @@ Route::middleware(['auth:api'])->group(function () {
             Route::delete('/', [UserSkillController::class, 'removeUserSkills']);
         });
 
-        # USER COMPANIES ROUTES
+        # USERS EXPERIENCES ROUTES
+        Route::apiResource('user-experiences', UserExperienceController::class);
+
+        # USERS EDUCATIONS ROUTES Rotues
+        Route::apiResource('user-educations', UserEducationController::class);
+
+        # USERS COMPANIES ROUTES
         Route::get('/companies', [UserJobController::class, 'index'])->name('users.companies');
 
         // USERS RESOURCE ROUTES
         // UPDATE: make a public user route that anyone can view
-        Route::get('/', [UserController::class, 'index'])->name('users.index');
-        Route::post('/', [UserController::class, 'store'])->name('users.store');
-        Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
-        Route::patch('/{user}', [UserController::class, 'update'])->name('users.update');
-        Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['verified'])->name('users.destroy');
+        Route::patch('/update-password', [UserController::class, 'updateUserPassword']);
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{user}', [UserController::class, 'show']);
+        Route::patch('/{user}', [UserController::class, 'update']);
+        Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['verified']);
     });
-
-    // test remove this route replaced by the restful users user-info routes
-    # USER-INFO ROUTES
-    Route::prefix('user-info')->group(function () {
-        Route::get('/', [UserInfoController::class, 'index'])->name('user-info.index');
-        Route::patch('/', [UserInfoController::class, 'update'])->name('user-info.update');
-        Route::patch('/cover-image', [UserInfoController::class, 'updateCoverImage'])->name('user-info.update-cover');
-        Route::patch('/profile-image', [UserInfoController::class, 'updateProfileImage'])->name('user-info.update-profile-image');
-    });
-
-    # USER EXPERIENCES ROUTES
-    Route::apiResource('user-experiences', UserExperienceController::class);
-
-    # USER EDUCATIONS ROUTES Rotues
-    Route::apiResource('user-educations', UserEducationController::class);
 });
