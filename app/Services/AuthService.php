@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Helpers\JwtHelper;
 use Illuminate\Support\Str;
+use App\Models\UserContact;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\AccountConflictException;
@@ -60,6 +61,10 @@ class AuthService {
             'user_id' => $user->id,
             'first_name' => $request['first_name'],
             'last_name' => $request['last_name'],
+        ]);
+
+        UserContact::create([
+            'user_id' => $user->id,
         ]);
 
         return JwtHelper::generateAccessToken($user);
