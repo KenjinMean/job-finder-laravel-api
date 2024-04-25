@@ -4,12 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\JwtHelper;
 use Illuminate\Http\Response;
-use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Services\UserContactService;
 use App\Http\Requests\UpdateUserContactRequest;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class UserContactController extends Controller {
 
