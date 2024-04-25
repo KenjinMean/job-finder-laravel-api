@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\users\UserStoreRequest;
+use App\Http\Requests\users\UserUpdateEmailRequest;
+use App\Http\Requests\users\UserUpdatePasswordRequest;
 
 class UserController extends Controller {
 
@@ -25,10 +28,10 @@ class UserController extends Controller {
     }
 
     // |--------------------------------------------------------------------------
-    public function store(Request $request) { // FIX: create a request for storing user
+    public function store(UserStoreRequest $request) {
         $this->authorize('store');
         $validatedRequest = $request->validated();
-        $user = $this->userService->createUser($validatedRequest);
+        $user = $this->userService->store($validatedRequest);
 
         return response()->json(['message' => $user], Response::HTTP_CREATED);
     }
@@ -37,9 +40,27 @@ class UserController extends Controller {
     public function show() {
         $user = JwtHelper::getUserFromToken();
         $this->authorize('view', $user);
-        $response = $this->userService->getUser($user);
+        $response = $this->userService->show($user);
 
         return response()->json(["user" => $response], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function updateUserEmail(UserUpdateEmailRequest $request) {
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userService->updateUserEmail($user, $validatedRequest);
+
+        return response()->json(['message' => 'Email updated successfully'], Response::HTTP_OK);
+    }
+
+    // |--------------------------------------------------------------------------
+    public function updateUserPassword(UserUpdatePasswordRequest $request) {
+        $user = JwtHelper::getUserFromToken();
+        $validatedRequest = $request->validated();
+        $this->userService->updateUserPassword($user, $validatedRequest);
+
+        return response()->json(['message' => 'Password updated successfully'], Response::HTTP_OK);
     }
 
     // |--------------------------------------------------------------------------
