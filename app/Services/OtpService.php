@@ -6,8 +6,11 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Mail\OtpMail;
 use App\Http\Resources\UserResource;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class OtpService {
 
@@ -21,7 +24,9 @@ class OtpService {
   }
 
   /** --------------------------------------------------------- */
-  public function requestOtp($email) {
+  public function requestOtp($request) {
+    $email = $request->input('email');
+
     $user = User::where('email', $email)->firstOrFail();
 
     // Generate OTP code
@@ -38,41 +43,44 @@ class OtpService {
     try {
       Mail::to($user)->send(new OtpMail($userName, $otpCode));
     } catch (\Exception $e) {
-      return response()->json([
-        'message' => 'Failed to send OTP code. Please try again later.',
-      ], 500);
+      throw new Exception('Failed to send OTP code. Please try again later.');
     }
 
-    return response()->json([
-      'message' => 'OTP code sent successfully!',
-      'resend_timer_seconds' => config("otp.otp_resend_timer_seconds") + 60,
-    ]);
+    $resendTimerSeconds = config("otp.otp_resend_timer_seconds") + 60;
+
+    return $resendTimerSeconds;
   }
 
   /** --------------------------------------------------------- */
-  public function verifyOtp($email, $otp) {
+  public function verifyOtp($request) {
+    $email = $request->input('email');
+    $otp = $request->input('otp');
+
     $user = User::where('email', $email)->firstOrFail();
 
-    if (Hash::check($otp, $user->otp_code)) {
-      if (Carbon::now()->gt($user->otp_expires_at)) {
-        return response()->json([
-          'error' => 'The OTP has expired. Please request a new OTP.',
-        ], 400);
-      } else {
-        $user->otp_code = null;
-        $user->otp_expires_at = null;
-        $user->email_verified_at = now();
-        $user->save();
-
-        return response()->json([
-          'message' => 'OTP verified successfully!',
-          'user' => new UserResource($user)
-        ]);
-      }
-    } else {
-      return response()->json([
-        'error' => 'The OTP entered is incorrect. Please try again.',
-      ], 400);
+    // Check if user requested for OTP
+    if (!$user->otp_code) {
+      throw new NotFoundHttpException('No OTP request found for this user.');
     }
+
+    // Check if provided OTP matches the user's OTP
+    if (!Hash::check($otp, $user->otp_code)) {
+      throw new UnauthorizedHttpException('', 'The OTP entered is incorrect. Please try again.');
+    }
+
+    // Check if OTP is expired
+    if (Carbon::now()->gt($user->otp_expires_at)) {
+      throw new UnauthorizedHttpException('', 'The OTP has expired. Please request a new OTP.');
+    }
+
+    // OTP is valid and not expired
+    $user->otp_code = null;
+    $user->otp_expires_at = null;
+    $user->email_verified_at = now();
+    $user->save();
+
+    $userResource = new UserResource($user);
+
+    return $userResource;
   }
 }

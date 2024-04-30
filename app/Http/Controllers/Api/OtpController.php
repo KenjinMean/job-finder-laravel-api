@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\OtpService;
-use Illuminate\Http\Request;
 use App\Http\Requests\OTPRequest;
+use App\Http\Requests\EmailRequest;
 use App\Http\Controllers\Controller;
 
 class OtpController extends Controller {
@@ -16,19 +16,22 @@ class OtpController extends Controller {
     }
 
     /** --------------------------------------------------------- */
-    public function requestOtp(Request $request) {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+    public function requestOtp(EmailRequest $request) {
+        $resendTimerSeconds = $this->OTPService->requestOtp($request);
 
-        $email = $request->input('email');
-        return $this->OTPService->requestOtp($email);
+        return response()->json([
+            'message' => 'OTP code sent successfully!',
+            'resend_timer_seconds' => $resendTimerSeconds
+        ]);
     }
 
     /** --------------------------------------------------------- */
     public function verifyOtp(OTPRequest $request) {
-        $email = $request->input('email');
-        $otp = $request->input('otp');
-        return $this->OTPService->verifyOtp($email, $otp);
+        $userResource = $this->OTPService->verifyOtp($request);
+
+        return response()->json([
+            "message" => 'OTP verified successfully!',
+            "user" => $userResource
+        ]);
     }
 }
