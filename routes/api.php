@@ -7,14 +7,15 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Middleware\CheckTokenExpiration;
-use App\Http\Controllers\api\UserJobController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\UserInfoController;
 use App\Http\Controllers\api\UserSkillController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\UserContactController;
+use App\Http\Controllers\api\UserCompanyController;
 use App\Http\Controllers\Api\UserEducationController;
 use App\Http\Controllers\Api\UserExperienceController;
+use App\Http\Controllers\api\UserCompanyJobController;
 use App\Http\Controllers\Api\EmailVerificationController;
 
 /*
@@ -31,45 +32,44 @@ use App\Http\Controllers\Api\EmailVerificationController;
 // NOTE: do not rearange routes to prevent route conflict
 
 Route::prefix('auth')->group(function () {
-    // FIX: make all routes under prefix routes
-});
+    # Authentication Routes
+    Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
+        Route::post('/login', [AuthController::class, 'login'])->name('login');
+        Route::post('/register', [AuthController::class, 'register'])->name('register');
+        Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('token.refresh');
+        Route::get('/check-email-availability', [AuthController::class, 'checkEmail'])->name('checkEmail');
+    });
+    Route::middleware(['auth:api'])->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    });
 
-# Authentication Routes
-Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('register', [AuthController::class, 'register'])->name('register');
-    Route::post('refresh-token', [AuthController::class, 'refreshToken'])->name('token.refresh');
-    Route::get('check-email-availability', [AuthController::class, 'checkEmail'])->name('checkEmail');
-});
-Route::middleware(['auth:api'])->group(function () {
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-});
+    # OAuth service providers route //SOCIALITE
+    Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
+        Route::get('/{provider}/redirect', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
+        Route::get('/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
+        Route::get('/{provider}/get-authorization-url', [SocialAuthController::class, 'getProviderAuthorizationUrl'])->name('social.getAuthUrl');
+    });
 
-# OAuth service providers route //SOCIALITE
-Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
-    Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
-    Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
-    Route::get('/auth/{provider}/get-authorization-url', [SocialAuthController::class, 'getProviderAuthorizationUrl'])->name('social.getAuthUrl');
-});
+    # OTP route
+    Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
+        Route::post('/request-otp', [OtpController::class, 'requestOtp'])->middleware(['throttle:6,1']);
+        Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->middleware(['throttle:6,1']);
+    });
 
-# OTP route
-Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
-    Route::post('/request-otp', [OtpController::class, 'requestOtp'])->middleware(['throttle:6,1']);
-    Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->middleware(['throttle:6,1']);
-});
-
-# Custom Email Verification Route
-Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
-    Route::prefix('email')->group(function () {
-        Route::get('/verify', [EmailVerificationController::class, 'verificationNotice'])
-            ->middleware(['auth:api', 'throttle:6,1'])
-            ->name('verification.notice');
-        Route::get('/verify/{id}/{hash}', [EmailVerificationController::class, 'verificationVerify'])
-            ->name('verification.verify');
-        Route::post('/verification-notification', [EmailVerificationController::class, 'verificationSend'])
-            ->middleware(['auth:api', 'throttle:6,1'])
-            ->name('verification.send');
-        Route::get('/verification-redirect', [EmailVerificationController::class, 'verificationRedirect']);
+    # To FIX: click link on email to verify when already has access to https
+    # Custom Email Verification Route
+    Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
+        Route::prefix('/email')->group(function () {
+            Route::get('/verify', [EmailVerificationController::class, 'verificationNotice'])
+                ->middleware(['auth:api', 'throttle:6,1'])
+                ->name('verification.notice');
+            Route::get('/verify/{id}/{hash}', [EmailVerificationController::class, 'verificationVerify'])
+                ->name('verification.verify');
+            Route::post('/verification-notification', [EmailVerificationController::class, 'verificationSend'])
+                ->middleware(['auth:api', 'throttle:6,1'])
+                ->name('verification.send');
+            Route::get('/verification-redirect', [EmailVerificationController::class, 'verificationRedirect']);
+        });
     });
 });
 
@@ -110,13 +110,14 @@ Route::prefix('companies')->group(function () {
     // public companies routes
     Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
         Route::get('/{company}', [CompanyController::class, 'show'])->name('companies.show');
+        // define route that can retrieve company jobs
     });
 
     Route::middleware(['auth:api', 'verified'])->group(function () {
         Route::get('/', [CompanyController::class, 'index'])->name('companies.index');
         Route::post('/', [CompanyController::class, 'store'])->name('companies.store');
         Route::patch('/{company}', [CompanyController::class, 'update'])->name('companies.update');
-        Route::patch('/{company}/company-image', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
+        Route::patch('/{company}/company-logo', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
         Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
         Route::delete('/{company}/company-logo', [CompanyController::class, 'deleteCompanyLogo'])->name('companies.delete-company-logo');
     });
@@ -179,8 +180,39 @@ Route::middleware(['auth:api'])->group(function () {
         # USERS EDUCATIONS ROUTES Rotues
         Route::apiResource('user-educations', UserEducationController::class);
 
-        # USERS COMPANIES ROUTES
-        Route::get('/companies', [UserJobController::class, 'index'])->name('users.companies');
+        // Routes for managing USER companies #USERS COMPANIES ROUTES
+        Route::prefix('/companies')->group(function () {
+            Route::get('/', [UserCompanyController::class, 'index']);
+            Route::get('/{company}', [UserCompanyController::class, 'show']);
+            Route::post('/', [UserCompanyController::class, 'store']);
+            Route::patch('/{company}', [UserCompanyController::class, 'update']);
+            Route::delete('/{company}', [UserCompanyController::class, 'delete']);
+            Route::patch('/{company}/company-logo', [UserCompanyController::class, 'updateCompanyLogo']);
+            Route::delete('/{company}/company-logo', [UserCompanyController::class, 'deleteCompanyLogo']);
+
+            // Routes for managing company jobs #USER COMPANY JOB
+            Route::prefix('/{company}/jobs')->group(function () {
+                Route::get('/', [UserCompanyJobController::class, 'index']);
+                Route::get('/{job}', [UserCompanyJobController::class, 'show']);
+                Route::post('/', [UserCompanyJobController::class, 'store']);
+                Route::patch('/{job}', [UserCompanyJobController::class, 'update']);
+                Route::delete('/{job}', [UserCompanyJobController::class, 'delete']);
+
+                // Routes for managing job skills #USER COMPANY JOB SKILL
+                Route::prefix('/{job}/skills')->group(function () {
+                    Route::patch('/', [UserCompanyJobController::class, 'jobSkillsAdd']);
+                    Route::patch('/{skill}', [UserCompanyJobController::class, 'jobSkillAdd']);
+                    Route::delete('/', [UserCompanyJobController::class, 'jobSkillsRemove']);
+                    Route::delete('/{skill}', [UserCompanyJobController::class, 'jobSkillRemove']);
+                });
+
+                // Routes for managing job types #USER COMPANY JOB JOB_TYPE
+                Route::patch('/{job}/job-types', [UserCompanyJobController::class, 'updateJobTypes']);
+
+                // Routes for managing work location types #USER COMPANY JOB WORK_LOCATION_TYPE
+                Route::patch('/{job}/work-location-types', [UserCompanyJobController::class, 'updateWorkLocationTypes']);
+            });
+        });
 
         // USERS RESOURCE ROUTES
         // UPDATE: make a public user route that anyone can view
