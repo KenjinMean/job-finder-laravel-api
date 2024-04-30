@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\users\UserShowRequest;
 use App\Http\Requests\users\UserStoreRequest;
 use App\Http\Requests\users\UserUpdateEmailRequest;
 use App\Http\Requests\users\UserUpdatePasswordRequest;
@@ -37,10 +38,12 @@ class UserController extends Controller {
     }
 
     // |--------------------------------------------------------------------------
-    public function show() {
+    # To IMPLEMENT: have this accept a parameter that you can specify what relationship to load
+    public function show(UserShowRequest $request) {
         $user = JwtHelper::getUserFromToken();
         $this->authorize('view', $user);
-        $response = $this->userService->show($user);
+        $validatedRequest = $request->validated();
+        $response = $this->userService->show($user, $validatedRequest);
 
         return response()->json(["user" => $response], Response::HTTP_OK);
     }
