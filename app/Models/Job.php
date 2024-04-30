@@ -33,6 +33,7 @@ class Job extends Model {
         return $this->belongsTo(Company::class);
     }
 
+    // unused
     public function category() {
         return $this->belongsTo(Category::class);
     }
@@ -53,16 +54,17 @@ class Job extends Model {
         parent::boot();
 
         static::creating(function ($job) {
-            $job->generateSlug();
+            $job->generateSlug($job->company->name);
         });
 
         static::updating(function ($job) {
-            $job->generateSlug();
+            $job->generateSlug($job->company->name);
         });
     }
 
-    public function generateSlug() {
-        $baseSlug = Str::slug($this->title . ' -at- ' . $this->company->name);
+
+    public function generateSlug($companyName) {
+        $baseSlug = Str::slug($this->title . ' -at- ' . $companyName);
 
         // Check if a job with the same slug already exists
         $count = self::where('slug', $baseSlug)->count();
@@ -77,25 +79,4 @@ class Job extends Model {
 
         $this->slug = $slug;
     }
-
-    // protected static function boot() {
-    //     parent::boot();
-
-    //     static::creating(function ($job) {
-    //         $baseSlug = Str::slug($job->title . ' -at- ' . $job->company->name);
-
-    //         // Check if a job with the same slug already exists
-    //         $count = self::where('slug', $baseSlug)->count();
-
-    //         if ($count > 0) {
-    //             // Append a unique suffix to the slug
-    //             $uniqueSuffix = time(); // used time as unique identifier
-    //             $slug = $baseSlug . '-' . $uniqueSuffix;
-    //         } else {
-    //             $slug = $baseSlug;
-    //         }
-
-    //         $job->slug = $slug;
-    //     });
-    // }
 }

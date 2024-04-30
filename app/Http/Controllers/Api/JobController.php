@@ -30,12 +30,15 @@ class JobController extends Controller {
         return $this->jobService->index($validatedRequest);
     }
 
+    // FIX: fix policies to match for updating jobs
     // |--------------------------------------------------------------------------
     public function store(JobRequest $request) {
         $validatedRequest = $request->validated();
 
         $job = new Job;
         $companyId = $validatedRequest['company_id'];
+
+        // fix auth use gate instead
         // Passes the Job instance and the associated company ID as parameters
         // to let Laravel know what policy to run.
         $this->authorize('store', [$job,  $companyId]);
@@ -92,7 +95,7 @@ class JobController extends Controller {
 
     // |--------------------------------------------------------------------------
     public function searchJobs(SearchJobRequest $request) {
-        // implemented filter on index that can handle searching filter. acn update frontend and remove this
+        // implemented filter on index that can handle searching filter. can update frontend and remove this
         $validatedRequest = $request->validated();
         return $this->jobService->searchJobs($validatedRequest);
     }
