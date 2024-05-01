@@ -35,10 +35,10 @@ class DatabaseSeeder extends Seeder {
         $this->call(CompanySizeCategorySeeder::class);
 
         /** Create 20 company */
-        \App\Models\Company::factory(5)->create();
+        \App\Models\Company::factory(100)->create();
 
         /** Create 40 jobs */
-        \App\Models\Job::factory(40)->create();
+        \App\Models\Job::factory(1000)->create();
 
         /** Create JobTypes */
         \App\Models\JobType::factory()->count(8)->create();

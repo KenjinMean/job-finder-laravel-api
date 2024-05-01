@@ -16,7 +16,6 @@ class UserContactController extends Controller {
         $this->userContactService = $userContactService;
     }
 
-    // can create a class that catch all exception that recieves parameter for error to know what error occured
     /** ------------------------------------------------------------------ */
     public function index() {
         $user = JwtHelper::getUserFromToken();
