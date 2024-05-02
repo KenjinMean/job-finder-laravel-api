@@ -27,7 +27,7 @@ class SocialAuthService {
         $error = request('error');
 
         if ($error === 'access_denied') {
-            return redirect(env('FRONTEND_URL') . '/auth/login?error=' . urlencode('Access denied. Please try again.'));
+            return redirect(env('FRONTEND_URL_WITH_SUBDIRECTORY', env('FRONTEND_URL')) . '/auth/login?error=' . urlencode('Access denied. Please try again.'));
         }
 
         $socialiteUser = Socialite::driver($provider)->stateless()->user();
@@ -38,12 +38,12 @@ class SocialAuthService {
 
         if ($existingUser) {
             if (!$existingUser->google_id && !$existingUser->github_id) {
-                return redirect(env('FRONTEND_URL') . '/auth/login?error=' . urlencode('This email already exists'));
+                return redirect(env('FRONTEND_URL_WITH_SUBDIRECTORY', env('FRONTEND_URL')) . '/auth/login?error=' . urlencode('This email already exists'));
             }
             if ($existingUser->$column != $socialiteUser->getId()) {
                 $providerName = $provider === 'github' ? 'Google' : 'GitHub';
                 $errorMessage = "Email already associated with " . $providerName;
-                return redirect(env('FRONTEND_URL') . '/auth/login?error=' . urlencode($errorMessage));
+                return redirect(env('FRONTEND_URL_WITH_SUBDIRECTORY', env('FRONTEND_URL')) . '/auth/login?error=' . urlencode($errorMessage));
             }
         }
 
@@ -76,6 +76,6 @@ class SocialAuthService {
         $UserResponse =  response()->json($AuthenticatedUserData);
         $response = json_encode($UserResponse);
         $encodedResponse = urlencode($response);
-        return redirect(env('FRONTEND_URL') . '/job-finder-react-frontend/auth/auth-provider-callback?response=' . $encodedResponse);
+        return redirect(env('FRONTEND_URL_WITH_SUBDIRECTORY', env('FRONTEND_URL')) . '/auth/auth-provider-callback?response=' . $encodedResponse);
     }
 }
