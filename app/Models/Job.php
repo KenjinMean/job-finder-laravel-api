@@ -62,21 +62,37 @@ class Job extends Model {
         });
     }
 
-
     public function generateSlug($companyName) {
         $baseSlug = Str::slug($this->title . ' -at- ' . $companyName);
 
         // Check if a job with the same slug already exists
-        $count = self::where('slug', $baseSlug)->count();
+        $count = self::where('slug', 'like', $baseSlug . '%')->count();
 
         if ($count > 0) {
             // Append a unique suffix to the slug
-            $uniqueSuffix = time(); // used time as unique identifier
-            $slug = $baseSlug . '-' . $uniqueSuffix;
+            $suffix = $count + 1;
+            $slug = $baseSlug . '-' . $suffix;
         } else {
             $slug = $baseSlug;
         }
 
         $this->slug = $slug;
     }
+
+    // public function generateSlug($companyName) {
+    //     $baseSlug = Str::slug($this->title . ' -at- ' . $companyName);
+
+    //     // Check if a job with the same slug already exists
+    //     $count = self::where('slug', $baseSlug)->count();
+
+    //     if ($count > 0) {
+    //         // Append a unique suffix to the slug
+    //         $uniqueSuffix = time(); // used time as unique identifier
+    //         $slug = $baseSlug . '-' . $uniqueSuffix;
+    //     } else {
+    //         $slug = $baseSlug;
+    //     }
+
+    //     $this->slug = $slug;
+    // }
 }
