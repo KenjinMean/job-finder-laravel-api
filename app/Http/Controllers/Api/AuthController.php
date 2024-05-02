@@ -6,13 +6,10 @@ use App\Helpers\JwtHelper;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\Response;
-use App\Helpers\ResponseHelper;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\EmailRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
-use App\Exceptions\AccountConflictException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller {
 

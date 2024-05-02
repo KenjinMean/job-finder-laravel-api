@@ -6,13 +6,12 @@ use App\Helpers\JwtHelper;
 use Illuminate\Http\Response;
 use App\Services\UserInfoService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\users\UserInfoStoreRequest;
-use App\Http\Requests\users\UserInfoUpdateReqeust;
-use App\Http\Requests\users\UserInfoCoverImageUpdateRequest;
-use App\Http\Requests\users\UserInfoProfileImageUpdateRequest;
+use App\Http\Requests\Users\UserInfoStoreRequest;
+use App\Http\Requests\Users\UserInfoUpdateReqeust;
+use App\Http\Requests\Users\UserInfoCoverImageUpdateRequest;
+use App\Http\Requests\Users\UserInfoProfileImageUpdateRequest;
 
 class UserInfoController extends Controller {
-
     private $userInfoService;
 
     public function __construct(UserInfoService $userInfoService) {

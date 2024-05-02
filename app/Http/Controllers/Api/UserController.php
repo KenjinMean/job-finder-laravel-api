@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\users\UserShowRequest;
-use App\Http\Requests\users\UserStoreRequest;
-use App\Http\Requests\users\UserUpdateEmailRequest;
-use App\Http\Requests\users\UserUpdatePasswordRequest;
+use App\Http\Requests\Users\UserShowRequest;
+use App\Http\Requests\Users\UserStoreRequest;
+use App\Http\Requests\Users\UserUpdateEmailRequest;
+use App\Http\Requests\Users\UserUpdatePasswordRequest;
 
 class UserController extends Controller {
 

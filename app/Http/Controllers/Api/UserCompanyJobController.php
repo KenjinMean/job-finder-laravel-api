@@ -11,8 +11,8 @@ use App\Services\UserCompanyJobService;
 use App\Http\Requests\UpdateJobTypeRequest;
 use App\Http\Requests\UpdateJobSkillRequest;
 use App\Http\Requests\UpdateworkLocationTypeRequest;
-use App\Http\Requests\users\UserCompanyJobStoreRequest;
-use App\Http\Requests\users\UserCompanyJobUpdateRequest;
+use App\Http\Requests\Users\UserCompanyJobStoreRequest;
+use App\Http\Requests\Users\UserCompanyJobUpdateRequest;
 
 class UserCompanyJobController extends Controller {
 

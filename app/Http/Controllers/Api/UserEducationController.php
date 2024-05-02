@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\JwtHelper;
-use App\Helpers\ExceptionHelper;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUserEducationRequest;
-use App\Services\UserEducationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
+use App\Services\UserEducationService;
+use App\Http\Requests\StoreUserEducationRequest;
 
 class UserEducationController extends Controller {
     /* ----------------------------------------------------------- */
