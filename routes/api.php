@@ -9,13 +9,13 @@ use App\Http\Controllers\Api\SkillController;
 use App\Http\Middleware\CheckTokenExpiration;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\UserInfoController;
-use App\Http\Controllers\api\UserSkillController;
+use App\Http\Controllers\Api\UserSkillController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\UserContactController;
-use App\Http\Controllers\api\UserCompanyController;
+use App\Http\Controllers\Api\UserCompanyController;
 use App\Http\Controllers\Api\UserEducationController;
 use App\Http\Controllers\Api\UserExperienceController;
-use App\Http\Controllers\api\UserCompanyJobController;
+use App\Http\Controllers\Api\UserCompanyJobController;
 use App\Http\Controllers\Api\EmailVerificationController;
 
 /*
