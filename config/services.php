@@ -35,13 +35,13 @@ return [
     'github' => [
         'client_id' => env('GITHUB_CLIENT_ID'),
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
-        'redirect' => 'http://localhost:8000/api/auth/github/callback',
+        'redirect' => env('GITHUB_REDIRECT'),
     ],
 
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => 'http://localhost:8000/api/auth/google/callback',
+        'redirect' => env('GOOGLE_REDIRECT'),
     ],
 
     'facebook' => [
