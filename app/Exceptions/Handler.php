@@ -8,6 +8,7 @@ use App\Helpers\ResponseHelper;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -44,6 +45,10 @@ class Handler extends ExceptionHandler {
 
     protected function handleApiExceptions($request, Throwable $exception) {
         logger()->debug($exception);
+
+        if ($exception instanceof JWTException) {
+            return ResponseHelper::generateErrorResponse($exception, "jwt token error", Response::HTTP_UNAUTHORIZED);
+        }
 
         if ($exception instanceof QueryException) {
             return ResponseHelper::generateErrorResponse($exception, "A database query exception occurred while processing the request.", Response::HTTP_INTERNAL_SERVER_ERROR);
