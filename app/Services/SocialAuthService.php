@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Helpers\JwtHelper;
+use App\Models\UserContact;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -50,9 +51,6 @@ class SocialAuthService {
         if (!$user) {
             $profileImage = $socialiteUser->getAvatar();
 
-            $defaultProfileImagePath = 'storage/user_profile_images/default-avatar.png';
-            $defaultCoverImagePath = 'storage/user_cover_images/default-cover.jpg';
-
             $randomPassword = Str::random(12);
 
             $user = User::create([
@@ -63,11 +61,14 @@ class SocialAuthService {
             ]);
 
             UserInfo::create([
+                'user_id' => $user->id,
                 'first_name' => $socialiteUser->getName(),
                 'last_name' => "",
+                'profile_image' => $profileImage ?: null,
+            ]);
+
+            UserContact::create([
                 'user_id' => $user->id,
-                'profile_image' => $profileImage ?: $defaultProfileImagePath,
-                'cover_image' => $defaultCoverImagePath,
             ]);
         }
 
