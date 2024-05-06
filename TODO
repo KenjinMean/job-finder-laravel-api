@@ -1,21 +1,53 @@
 Todo list
-make a Latest Job Posting:
 
-## NOTE: Add this to user info's
+## Visualize bundle:1
 
-Profile Picture
-Contact Information
-Resume or CV
-Location
-Skills and Experience
-Job Preferences
+-vite bundle visualizer "npx vite-bundle-visualizer"
 
 ## CURRENT:1
 
+-recover password
+-create a button that conditionally renders dialog like material ui
+-fix the default image of imageloaderutil if no image provided
+-fix: when navigating back to user profile page the title is not set back to "Profile"
+-ad self-employed on job_type
+
+-modalpages is needed for lazyloading
+-implement the automatic generation of modals and import the modalpages so that you can utilize the lazyloading
+
+-refactor profile image preview to use only thaat component to also preview the new profile image by checking if the user uploaded new image then visually change the buttons and Texts to updating. heres some inspiration https://dev.to/yosraskhiri/make-an-image-preview-in-react-js-301f.
+
+-HIGH - when opening a modal overlay preserve the route parameters before appending the modals then when closing delete anything that appends when modal is opened. this is to rpeserve while on edit modal with additional prameter
+
+-memoized user cards to avoid unecessary rerenders
+
+-make position optional
+-implement add and edit experience on modals
+-implement add user education
+-fix experince end date and present
+
+-convert logout to toast notification on error
+
+-create better error boundary to catch api errors
+
+-create a helper function to detect if user is not connected to internet the it will display "you are offline?"
+
+-make the modal confirmation accept message lik for deleting or exiting
+-create useTruncate and seemore button components on userAbout
+
+-refactor modal, add ModalUsingState, and ModalUsingUrlParam and the use hook to open the modal
+like useOpenModalUsingState and useOpenModalUsingUrlParam
+
+-explore refactoring code to have a layout on every page.
+-change the addskill success/error icons to svgs because png is heavy
+-404 on api not catched by error boundary
+
+-update the transitions to target it transition value not all
+
+-add HMO benefits on benefits
 -create some ci / cd for qualifications and update skills table add more skills
 
 -update phone regex pattern
--load the image not using imageLoaderUtil because of flashing
 -change moment library for smaller library
 -contact edit form not lazy loaded
 -fix jobDetails layout
@@ -294,6 +326,7 @@ make a post a job page:
 -fix labeledtexinput on the autocomplete and name label tags
 -fix modal auto height
 -implement contact section
+-implement education policy
 -remove lazy loading on update profile and cover preview modal to avoid flashing
 -update modal to have style that has a fixed header or style that you provide the header
 -extract boolean from menu in ProfileDropdownmenu and use it as conditinal rendering to use animate prescence
@@ -303,3 +336,66 @@ make a post a job page:
 -conditional render the remove account on options/settings component
 -clean dependency for unused deps
 -fix dark and light icons
+-remove try catch block on api request so the error bouncary can catch it
+-replace maxwidthwrapper util with the layout wrapper that containse the maxwitdh and accept class
+-make error boundary for each page or component to not break the app
+-implement useIntersectionOberserver on search result page
+-font optimization use google font cdn and multiple fallback fonts
+-remove worklocationtypes on jobtypes because its already seperated, include work_location_type on the job_preliminary together with the job_types
+-infinite fetch job is not working on browser zoomed out or in state
+-handle user education add, update, delete
+-update userSkills if the skills added on updateUserExpereince is not on user skills
+-handle update user experience
+-handle show/remove skill on skills array on adding/removing skills
+-handle add skill on add/edit user experience modal
+-on addskill on add/edit modal, send the skills as an array then on submit. loop through that array to append them in experience_skill pivot table
+-convert the 1 or 0 values of is_current to true or false before sending it to the server to avoid unexpected bug on because php handes boolean differently from javascript
+-check modal util if you can pass a custom close function fro simple modal usage using conditional rendering states
+-on update of use skill on experience, if user removed skill then remove if its not used on another experience?
+-can convert to passing the experience id on the openModalparam on edit modal,
+-handle Im currently working here to remove or disable end_date
+-handle user experience add, edit, delete
+-convert modal exit confirmation to new action confirmation dialog
+-add check on experience and education, startDate should be greater that end date
+-fix user education card, details, and updated, delete, create, fucntions to use mutation
+-implement the skill functions on user controller for user skill restful api
+-seperate user contact add adn edit modal and condiotional render the modals if user has no contact render add contact link then if there is already a contact then render edit contact link that navigates to respective modal
+-refactor useHooks that uses toast to implement the toast inside the apiHook instead of calling in the component using toast.promise
+-implement the fetch check user email if available on registering email
+-delete the components replaced by card components
+-rerun migration to save chanegs to nullable field on user_education_migration
+-finish adding expiration on otp and otp verification
+-use zustand store instead of url parameter for storing email and validation like hasUserRequestedOtp="true"
+-rate limit requestng and validating otp, response with please wait for number of minute before requesting again
+-disable option button on experience or education when deleting
+
+-ensure that user has requested for otp before redirecting to otp validation page.
+use a state manager? if user go to auth/otp validation and not requested otp do no allow
+wait for the response of user sending otp request to use to authorize user to the opt validationpage
+-return to userStore to store user_info because there is a bug on token refresh when using refetch.
+-commit otp_code implementation
+-fix jobs api convert to RESTFUL API
+-add more api error exceptions on handler
+-remove try catch on controller because api errors is handled on the handler
+-display the contact location under user info then open modal to view contact
+
+-create api error response on handler to centralize api error response
+-extract resource(company, jobs) on the service not on the controller to seperate concerns
+-remove db transaction from user update profile and cover photo
+-create centralized error catchng with all exceptions and accepts error parameter for error
+-make the fetch resource response a key value pairs for for good practice
+
+-can make UserSkillCOntroller to seperate it from user controller
+
+-modify all user related routes to go under user prefix to adhere to RESTFUL api convention
+
+-fix provider not accessible on AccountConflictException
+-refactor services to instead of returning error response directly when condition is not met, it should throw exception and let the controller handle the response and so on for success
+
+-use the response helpers on all controllers to handle if the service has error
+-remove try catch from services
+
+-if response is unauthenticated, remove token from local storage
+-seperate user info from user and authentications
+
+-finish email verification success and redirects
