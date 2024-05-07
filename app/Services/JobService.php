@@ -10,15 +10,22 @@ use App\Http\Resources\JobPreliminaryResource;
 class JobService {
   public function index($validatedRequest) {
 
-    $keyword = $validatedRequest['keyword'] ?? null;
-    $skills = $validatedRequest['skills'] ?? [];
-    $jobTypes = $validatedRequest['job_type'] ?? [];
+    // Filters
+    $title = $validatedRequest['title'] ?? null;
+    $location = $validatedRequest['location'] ?? null;
+    $companyName = $validatedRequest['company'] ?? null;
     $minSalary = $validatedRequest['min_salary'] ?? null;
     $maxSalary = $validatedRequest['max_salary'] ?? null;
+
+    // Filters that is an array
+    $skills = $validatedRequest['skills'] ?? [];
+    $jobTypes = $validatedRequest['job_type'] ?? [];
     $workLocationTypes = $validatedRequest['work_location_type'] ?? [];
 
-    $load = $validatedRequest['load'] ?? [];
+    // Relationship to Load 
+    $load = $validatedRequest['load'] ?? []; // skills, company, jobTypes, workLocationTypes
 
+    // Sorting Criteria
     $orderBy = $validatedRequest['order_by'] ?? 'created_at';
     $orderDirection = $validatedRequest['order_direction'] ?? 'desc';
     $perPage = $validatedRequest['per_page'] ?? 10;
@@ -31,22 +38,43 @@ class JobService {
       $query->with($load);
     }
 
-    // Filter job postings by keyword
-    if ($keyword) {
-      $query->where('title', 'like', "%$keyword%");
+    // Filter job postings by title
+    if ($title) {
+      $query->where('title', 'like', "%$title%");
+    }
+
+    // Filter job postings by company name
+    if ($companyName) {
+      $query->whereHas('company', function ($query) use ($companyName) {
+        $query->where('name', 'like', "%$companyName%");
+      });
     }
 
     // Filter job postings by job types
     if (!empty($jobTypes)) {
       $query->whereHas('jobTypes', function ($query) use ($jobTypes) {
-        $query->whereIn('job_type', $jobTypes);
+        // Check if the first element of $jobTypes is numeric (ID) or a string
+        if (is_numeric($jobTypes[0])) {
+          // Use job type IDs
+          $query->whereIn('job_types.id', $jobTypes); // Assuming 'id' is the primary key of job_types table
+        } else {
+          // Use job type strings
+          $query->whereIn('job_type', $jobTypes);
+        }
       });
     }
 
-    // Filter job postings by the specified jobType
+    // Filter job postings by the specified work location types
     if (!empty($workLocationTypes)) {
       $query->whereHas('workLocationTypes', function ($query) use ($workLocationTypes) {
-        $query->whereIn('name', $workLocationTypes);
+        // Check if the first element of $workLocationTypes is numeric (ID) or a string
+        if (is_numeric($workLocationTypes[0])) {
+          // Use work location type IDs
+          $query->whereIn('work_location_types.id', $workLocationTypes); // Assuming 'id' is the primary key of work_location_types table
+        } else {
+          // Use work location type strings
+          $query->whereIn('name', $workLocationTypes);
+        }
       });
     }
 
@@ -65,6 +93,11 @@ class JobService {
       $query->whereHas('skills', function ($query) use ($skills) {
         $query->whereIn('name', $skills);
       });
+    }
+
+    // Filter job postings by location
+    if ($location) {
+      $query->where('location', 'like', "%$location%");
     }
 
     // Order job postings
