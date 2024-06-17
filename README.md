@@ -30,7 +30,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/KenjinMean/job-finder-laravel-api">
-    <img src="public/storage/assets/logo/JobFinderLogo.png" alt="Logo" height="80">
+    <img src="public/JobFinderLogo.png" alt="Logo" height="80">
   </a>
 
 <h3 align="center">Job Finder Laravel API</h3>
@@ -221,7 +221,7 @@ Use this space to list resources you find helpful and would like to give credit 
 [license-url]: https://github.com/KenjinMean/job-finder-laravel-api/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/genesis-saquibal-9b99a5245
-[product-screenshot]: storage/app/public/assets/app/jobFinderApiDocs.PNG
+[product-screenshot]: public/jobFinderApiDocs.PNG
 [Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
 [Laravel-url]: https://laravel.com
 [MySQL.com]: https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white
