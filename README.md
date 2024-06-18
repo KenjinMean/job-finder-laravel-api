@@ -89,6 +89,7 @@
 
 -   [![Laravel][Laravel.com]][Laravel-url]
 -   [![MySQL][MySQL.com]][MySQL-url]
+-   [![JWT][JWT.com]][JWT-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -142,7 +143,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Roadmap
 
--   [ ] Feature 1
+-   [ ] Implement Secure JWT token using cookies when already have access to https
 -   [ ] Feature 2
 -   [ ] Feature 3
     -   [ ] Nested Feature
@@ -226,3 +227,5 @@ Use this space to list resources you find helpful and would like to give credit 
 [Laravel-url]: https://laravel.com
 [MySQL.com]: https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white
 [MySQL-url]: https://www.mysql.com/
+[JWT.com]: https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens
+[JWT-url]: https://github.com/PHP-Open-Source-Saver/jwt-auth
