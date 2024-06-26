@@ -104,40 +104,86 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-
--   npm
-    ```sh
-    npm install npm@latest -g
-    ```
-
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+Before you start, please check the official Laravel installation guide for server requirements: [Official Documentation](https://laravel.com/docs/5.4/installation#installation).
+
+1. **Clone the repository**:
+
     ```sh
     git clone https://github.com/KenjinMean/job-finder-laravel-api.git
     ```
-3. Install NPM packages
+
+2. **Install all dependencies using Composer**:
+
     ```sh
-    npm install
+    composer install
     ```
-4. Enter your API in `config.js`
-    ```js
-    const API_KEY = "ENTER YOUR API";
+
+3. **Copy the example environment file and make required configuration changes in the `.env` file**:
+
+    ```sh
+    cp .env.example .env
     ```
+
+4. **Generate a new application key**:
+
+    ```sh
+    php artisan key:generate
+    ```
+
+5. **Generate a new JWT authentication secret key**:
+
+    ```sh
+    php artisan jwt:secret
+    ```
+
+6. **Create a symbolic link for the storage**:
+
+    ```sh
+    php artisan storage:link
+    ```
+
+7. **Run the database migrations** (**Set the database connection in `.env` before migrating**):
+
+    ```sh
+    php artisan migrate
+    ```
+
+8. **Start the local development server**:
+    ```sh
+    php artisan serve
+    ```
+
+You can now access the server api at [http://localhost:8000](http://localhost:8000/api).
+
+## Database Seeding
+
+Populate the database with seed data, including users, articles, comments, tags, favorites, and follows. This can help you quickly start testing the API or couple a frontend and start using it with ready content.
+
+1. **Open `DatabaseSeeder.php` and set the property values as per your requirements**:
+
+    ```php
+    // Edit this file: database/seeders/DatabaseSeeder.php
+    ```
+
+2. **Run the database seeder**:
+    ```sh
+    php artisan db:seed
+    ```
+
+**Note**: It's recommended to have a clean database before seeding. You can refresh your migrations at any point to clean the database by running:
+`sh
+    php artisan migrate:refresh
+    `
+
+By following these steps, you'll set up your Laravel application and populate your database with sample data for testing and development.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- USAGE EXAMPLES -->
+## Dependencies
 
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+-   [jwt-auth](https://github.com/PHP-Open-Source-Saver/jwt-auth.git) - For authentication using JSON Web Tokens
 
 <!-- ROADMAP -->
 
