@@ -16,15 +16,16 @@ class DatabaseSeeder extends Seeder {
      * Seed the application's database.
      */
     public function run(): void {
-        /** Create 5 users */
-        \App\Models\User::factory(5)->create();
 
-        /** Create single user */
+        /** Create sample user */
         \App\Models\User::factory()->create([
             'email' => 'test@example.com',
             'email_verified_at' => now(),
             'password' => 'password',
         ]);
+
+        /** Create 5 dummy users */
+        \App\Models\User::factory(5)->create();
 
         /** Generate UserInfo */
         User::all()->each(function ($user) {
@@ -56,7 +57,6 @@ class DatabaseSeeder extends Seeder {
         $this->call(JobJobTypeSeeder::class);
 
         $this->call(WorkLocationTypeSeeder::class);
-
 
         /** Generate UserContact for each user */
         User::all()->each(function ($user) {

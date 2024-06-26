@@ -17,7 +17,16 @@ class UserCompanyService {
   }
 
   // |--------------------------------------------------------------------------
-  public function store($user, $validatedRequest): void {
+  public function store($user, $validatedRequest, $companyLogo): void {
+    // Ensure the directory exists before putting company logos
+    if (!Storage::disk('public')->exists('company_logos')) {
+      Storage::disk('public')->makeDirectory('company_logos');
+    }
+
+    if ($companyLogo) {
+      $validatedRequest['company_logo'] = 'storage/' . $companyLogo->store('company_logos', 'public');
+    }
+
     $validatedRequest['user_id'] = $user->id;
     Company::create($validatedRequest);
   }
@@ -34,6 +43,11 @@ class UserCompanyService {
 
   // |--------------------------------------------------------------------------
   public function updateCompanyLogo($validatedRequest, $company): void {
+    // Ensure the directory exists
+    if (!Storage::disk('public')->exists('company_logos')) {
+      Storage::disk('public')->makeDirectory('company_logos');
+    }
+
     $newCompanyLogoPath = Storage::disk('public')->put('company_logos', $validatedRequest['company_logo']);
 
     $existingCompanyLogo = $company->company_logo;
@@ -44,6 +58,7 @@ class UserCompanyService {
     }
 
     // Convert backslashes to forward slashes in file path
+    // Storage returns \\ for file path
     $newCompanyLogoPath = 'storage/' . str_replace('\\', '/', $newCompanyLogoPath);
     $company->company_logo = $newCompanyLogoPath;
 

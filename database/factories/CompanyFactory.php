@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\CompanySizeCategory;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Company>
@@ -75,6 +76,11 @@ class CompanyFactory extends Factory {
         shuffle($companyDescriptionElements);
         $randomElements = array_slice($companyDescriptionElements, 0, $randomNumber);
         $combinedDescription = implode(" ", $randomElements);
+
+        // Ensure the directory exists
+        if (!Storage::disk('public')->exists('company_logos')) {
+            Storage::disk('public')->makeDirectory('company_logos');
+        }
 
         return [
             'name' => fake()->company,

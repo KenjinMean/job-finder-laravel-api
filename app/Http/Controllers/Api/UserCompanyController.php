@@ -38,7 +38,7 @@ class UserCompanyController extends Controller {
     public function store(StoreCompanyRequest $request) {
         $user = JwtHelper::getUserFromToken();
         $validatedRequest = $request->validated();
-        $this->userCompanyService->store($user, $validatedRequest);
+        $this->userCompanyService->store($user, $validatedRequest, $request->file('company_logo'));
 
         return response()->json(['message' => 'Company Created successfully.'], Response::HTTP_CREATED);
     }
