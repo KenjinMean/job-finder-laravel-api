@@ -244,7 +244,7 @@ a.es-button, button.es-button {
                   <td valign="top" align="center" style="padding:0;Margin:0;width:580px">
                    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                      <tr style="border-collapse:collapse">
-                      <td align="center" style="padding:0;Margin:0;font-size:0"><a href="https://viewstripo.email/" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#CCCCCC;font-size:14px"><img src="{{asset('jobfinderlogo.png') }}"></a></td>
+                      <td align="center" style="padding:0;Margin:0;font-size:0"><a href="https://viewstripo.email/" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#CCCCCC;font-size:14px"><img src="{{asset('JobFinderLogo.png') }}"></a></td>
                      </tr>
                    </table></td>
                  </tr>
