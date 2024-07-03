@@ -50,6 +50,10 @@ class Job extends Model {
         return $this->belongsToMany(WorkLocationType::class);
     }
 
+    public function usersWhoSaved() {
+        return $this->belongsToMany(User::class, 'user_saved_jobs');
+    }
+
     protected static function boot() {
         parent::boot();
 
@@ -79,20 +83,12 @@ class Job extends Model {
         $this->slug = $slug;
     }
 
+    # UPDATE job slug creation with this function that prepends job Id so that we can extract the id and use for querying
     // public function generateSlug($companyName) {
+    //     // Generate the base slug
     //     $baseSlug = Str::slug($this->title . ' -at- ' . $companyName);
 
-    //     // Check if a job with the same slug already exists
-    //     $count = self::where('slug', $baseSlug)->count();
-
-    //     if ($count > 0) {
-    //         // Append a unique suffix to the slug
-    //         $uniqueSuffix = time(); // used time as unique identifier
-    //         $slug = $baseSlug . '-' . $uniqueSuffix;
-    //     } else {
-    //         $slug = $baseSlug;
-    //     }
-
-    //     $this->slug = $slug;
+    //     // Prepend the job ID to the slug
+    //     $this->slug = $this->id . '-' . $baseSlug;
     // }
 }

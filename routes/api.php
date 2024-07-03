@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\UserEducationController;
 use App\Http\Controllers\Api\UserExperienceController;
 use App\Http\Controllers\Api\UserCompanyJobController;
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\SavedJobController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,8 @@ Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
 
+    # Create user forget password route
+
     # OAuth service providers route //SOCIALITE
     Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
         Route::get('/{provider}/redirect', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
@@ -50,13 +53,14 @@ Route::prefix('auth')->group(function () {
         Route::get('/{provider}/get-authorization-url', [SocialAuthController::class, 'getProviderAuthorizationUrl'])->name('social.getAuthUrl');
     });
 
-    # OTP route
+    # OTP route, email verify OTP
+    # rename route to request-email-verify-otp, to clarify the route purpose, same with verify
     Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
         Route::post('/request-otp', [OtpController::class, 'requestOtp'])->middleware(['throttle:6,1']);
         Route::post('/verify-otp', [OtpController::class, 'verifyOtp'])->middleware(['throttle:6,1']);
     });
 
-    # To FIX: click link on email to verify when already has access to https
+    # TO IMPELEMENT : can't implement because there is no access to https(secure) url yet
     # Custom Email Verification Route
     Route::withoutMiddleware([CheckTokenExpiration::class])->group(function () {
         Route::prefix('/email')->group(function () {
@@ -180,7 +184,15 @@ Route::middleware(['auth:api'])->group(function () {
         # USERS EDUCATIONS ROUTES Rotues
         Route::apiResource('user-educations', UserEducationController::class);
 
-        // Routes for managing USER companies #USERS COMPANIES ROUTES
+        # USERS SAVED JOBS ROUTES
+        Route::prefix('/save-jobs')->group(function () {
+            Route::get('/', [SavedJobController::class, 'index']);
+            Route::post('/{job}', [SavedJobController::class, 'store']);
+            Route::delete('/{job}', [SavedJobController::class, 'delete']);
+        });
+
+        #USERS COMPANIES ROUTES
+        // Routes for managing USER companies 
         Route::prefix('/companies')->group(function () {
             Route::get('/', [UserCompanyController::class, 'index']);
             Route::get('/{company}', [UserCompanyController::class, 'show']);
@@ -190,7 +202,8 @@ Route::middleware(['auth:api'])->group(function () {
             Route::patch('/{company}/company-logo', [UserCompanyController::class, 'updateCompanyLogo']);
             Route::delete('/{company}/company-logo', [UserCompanyController::class, 'deleteCompanyLogo']);
 
-            // Routes for managing company jobs #USER COMPANY JOB
+            #USERS COMPANY JOB
+            // Routes for managing company jobs 
             Route::prefix('/{company}/jobs')->group(function () {
                 Route::get('/', [UserCompanyJobController::class, 'index']);
                 Route::get('/{job}', [UserCompanyJobController::class, 'show']);
@@ -198,7 +211,8 @@ Route::middleware(['auth:api'])->group(function () {
                 Route::patch('/{job}', [UserCompanyJobController::class, 'update']);
                 Route::delete('/{job}', [UserCompanyJobController::class, 'delete']);
 
-                // Routes for managing job skills #USER COMPANY JOB SKILL
+                #USER COMPANY JOB SKILL
+                // Routes for managing job skills 
                 Route::prefix('/{job}/skills')->group(function () {
                     Route::patch('/', [UserCompanyJobController::class, 'jobSkillsAdd']);
                     Route::patch('/{skill}', [UserCompanyJobController::class, 'jobSkillAdd']);
@@ -206,10 +220,12 @@ Route::middleware(['auth:api'])->group(function () {
                     Route::delete('/{skill}', [UserCompanyJobController::class, 'jobSkillRemove']);
                 });
 
-                // Routes for managing job types #USER COMPANY JOB JOB_TYPE
+                #USER COMPANY JOB JOB_TYPE
+                // Routes for managing job types 
                 Route::patch('/{job}/job-types', [UserCompanyJobController::class, 'updateJobTypes']);
 
-                // Routes for managing work location types #USER COMPANY JOB WORK_LOCATION_TYPE
+                #USER COMPANY JOB WORK_LOCATION_TYPE
+                // Routes for managing work location types 
                 Route::patch('/{job}/work-location-types', [UserCompanyJobController::class, 'updateWorkLocationTypes']);
             });
         });

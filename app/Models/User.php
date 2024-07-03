@@ -98,4 +98,8 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject {
     public function userWorkExperiences() {
         return $this->hasMany(UserWorkExperience::class);
     }
+
+    public function savedJobs() {
+        return $this->belongsToMany(Job::class, 'user_saved_jobs');
+    }
 }
