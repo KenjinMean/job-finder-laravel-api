@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserInfoController;
 use App\Http\Controllers\Api\SavedJobController;
-use App\Http\Controllers\api\UserSkillController;
+use App\Http\Controllers\Api\UserSkillController;
 use App\Http\Controllers\Api\UserContactController;
-use App\Http\Controllers\api\UserCompanyController;
+use App\Http\Controllers\Api\UserCompanyController;
 use App\Http\Controllers\Api\UserEducationController;
 use App\Http\Controllers\Api\UserExperienceController;
-use App\Http\Controllers\api\UserCompanyJobController;
+use App\Http\Controllers\Api\UserCompanyJobController;
 
 // NOTE: do not rearange routes to prevent route conflict
 
