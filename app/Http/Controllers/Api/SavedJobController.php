@@ -15,7 +15,7 @@ class SavedJobController extends Controller {
     // }
     public function index() {
         $user = JwtHelper::getUserFromToken();
-        $savedJobs = $user->savedJobs()->get();
+        $savedJobs = $user->savedJobs()->with(['company', 'jobTypes', 'workLocationTypes'])->get();
 
         return response()->json($savedJobs, 200);
     }
