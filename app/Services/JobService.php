@@ -6,6 +6,7 @@ use App\Models\Job;
 use App\Models\Skill;
 use App\Http\Resources\JobDetailsResource;
 use App\Http\Resources\JobPreliminaryResource;
+use Illuminate\Support\Facades\DB;
 
 class JobService {
   public function index($validatedRequest) {
@@ -79,13 +80,16 @@ class JobService {
     }
 
     // Filter job postings by the specified minimum salary
+    // if ($minSalary !== null) {
+    //   $query->where('salary', '>=', $minSalary);
+    // }
     if ($minSalary !== null) {
-      $query->where('salary', '>=', $minSalary);
+      $query->where(DB::raw('CAST(salary AS UNSIGNED)'), '>=', $minSalary);
     }
 
     // Filter job postings by the specified maximum salary
     if ($maxSalary !== null) {
-      $query->where('salary', '<=', $maxSalary);
+      $query->where(DB::raw('CAST(salary AS UNSIGNED)'), '<=', $maxSalary);
     }
 
     // Filter job postings that require any of the skills provided
