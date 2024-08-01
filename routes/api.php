@@ -25,3 +25,9 @@ require __DIR__ . "/api/skill_route/skillRoutes.php";
 
 # USER ROUTES
 require __DIR__ . "/api/user_route/userRoutes.php";
+
+# JOB TYPE ROUTES
+require __DIR__ . "/api/job_type_route/jobTypeRoute.php";
+
+# WORK LOCATION TYPE ROUTES
+require __DIR__ . "/api/work_location_type_route/workLocationTypeRoute.php";
