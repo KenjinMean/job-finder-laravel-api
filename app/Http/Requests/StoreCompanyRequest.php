@@ -23,7 +23,7 @@ class StoreCompanyRequest extends FormRequest {
             'website'  => 'string|nullable',
             'location'  => 'string|nullable',
             'description'  => 'string|nullable',
-            'company_logo'  => 'nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'company_logo' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'email' => 'string|nullable',
             'phone' => 'string|nullable',
             'company_size_id' => 'integer|nullable',

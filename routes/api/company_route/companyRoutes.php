@@ -29,6 +29,6 @@ Route::prefix('companies')->group(function () {
     Route::patch('/{company}', [CompanyController::class, 'update'])->name('companies.update');
     Route::patch('/{company}/company-logo', [CompanyController::class, 'updateCompanyImage'])->name('companies.update-company-image');
     Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
-    Route::delete('/{company}/company-logo', [CompanyController::class, 'deleteCompanyLogo'])->name('companies.delete-company-logo');
+    Route::delete('/{company}/company-logo', [CompanyController::class, 'deleteCompanyImage'])->name('companies.delete-company-logo');
   });
 });

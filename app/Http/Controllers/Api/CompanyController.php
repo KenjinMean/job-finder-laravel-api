@@ -57,7 +57,7 @@ class CompanyController extends Controller {
     }
 
     // |--------------------------------------------------------------------------
-    public function deleteCompanyLogo(Company $company) {
+    public function deleteCompanyImage(Company $company) {
         $this->authorize('update', $company);
         $this->companyService->deleteCompanyLogo($company);
         return response()->json(["message" => "company logo deleted successfully."], Response::HTTP_OK);
